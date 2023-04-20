@@ -1,10 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
-
-<!-- Mirrored from beefers.dev/articles/WhyRewriteYourSite by HTTrack Website Copier/3.x [XR&CO'2014], Thu, 20 Apr 2023 07:25:07 GMT -->
-<!-- Added by HTTrack -->
 <meta http-equiv="content-type" content="text/html;charset=utf-8" />
-<!-- /Added by HTTrack -->
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width">
@@ -59,86 +55,7 @@
       <span>2022-09-10</span> </div>
   </div>
   </a> <span class="pb-4">
-	<!-- 
-  <h1 id="what">What?</h1>
-  <p>If you’re not aware, the site you are currently viewing is the <del>6th</del> 7th iteration - each time being a complete rewrite. Each version used a subtly different framework, too!</p>
-  <p>This article will serve as a comprehensive list of this site’s iterations, as well as justification for rewriting it so many times.</p>
-  <h1 id="history">History</h1>
-  <h2 id="legacy--version-0">Legacy / Version 0</h2>
-  <p>This iteration was written in HTML, CSS and JS, and was my first dive into web development. There is no hosted version anymore. The source code is <a href="http://github.com/Snupaiers/site/tree/legacy">here</a>. During this time, my online name was <code>rem</code>, a decision I regret.</p>
-  <h2 id="version-1">Version 1</h2>
-  <p>Version 1 marked the migration from GitHub Pages to Vercel. It was written using SvelteKit, and was effectively a direct port of Legacy. It remained relatively similar to the first commit throughout it’s lifespan. Here are the <a href="http://rem-my-github-io-kp5pssc3h-rem-my.vercel.app/">first</a> and <a href="http://site-git-v1-beefers.vercel.app/">last</a> commits.</p>
-  <h2 id="version-2">Version 2</h2>
-  <p>In Version 2, I explored “advanced” CSS styling, using transitions to animate page switching, among other things. It was also written using SvelteKit, and made use of the <a href="http://draculatheme.com/">Dracula</a> colour scheme. Between the <a href="http://site-9zgoiir3s-rem-my.vercel.app/">first working commit</a> and <a href="http://site-git-v2-beefers.vercel.app/">last commit</a>, I moved back to using <code>Snupai</code> as my online name.</p>
-  <h2 id="version-3">Version 3</h2>
-  <p>Version 3 was… certainly an interesting case. It had 6 commits, with only 4 of them adding meaningful content, and some being outright broken on Vercel. The first commit did not work, and the last commit edited the README. This was the result of me being unable to deal with a few annoyances I encountered when using Astro and Svelte together - for example, fonts would not load properly. Considering the current iteration is also written with Astro, I guarantee these issues came from lack of experience as opposed to software bugs.</p>
-  <h2 id="version-4">Version 4</h2>
-  <p>Version 4 was when I began to take web development more seriously. I wanted a real portfolio, and my own space on the internet. Unfortunately, this version never quite became what I imagined, remaining with placeholder text on the front page throughout it’s lifespan. I am still proud of it, however, since it is written fairly sanely, using a tech stack of SolidJS, WindiCSS and Vite. The first 2 commits (4 deployments) did not work. Here is the <a href="http://site-jh5zqygpw-beefers.vercel.app/">first working commit</a> and the <a href="http://site-git-v4-beefers.vercel.app/">last commit</a>.</p>
-  <h2 id="version-5">Version 5</h2>
-  <p>In this iteration, I (at the time) thought I had <em>perfected</em> my website. Oh, how wrong I was! It used the same tech stack as Version 4, alongside TypeScript. The idea was that I would make it maintainable, preventing further rewrites. However, I quickly realised that a SolidJS app is not a good fit for a static site like this one. I never made use of the reactivity, so what was the point? In the end, I started work on yet another rewrite. Despite this, I am still proud of it. Here is the <a href="http://site-avz3yew0y-beefers.vercel.app/">first commit</a>, the <a href="http://site-8hxubuf83-beefers.vercel.app/">first restyling commit</a>, the <a href="https://site-ju02v5g2r-beefers.vercel.app/">second restyling commit</a> and the <a href="https://site-git-v5-beefers.vercel.app/">last commit</a>.</p>
-  <h2 id="version-6">Version 6</h2>
-  <p>The version you are looking at! I am very proud of it, as it uses an amazing tech stack consisting of Astro, UnoCSS and Vite. The styling makes me happy, <a href="http://github.com/catppuccin">Catppuccin</a> is very nice. I’ve said this with every iteration but I truly believe that Version 6 can be maintainable into the future, and should stop me from rewriting again. <sub>No promises, though.</sub> Here is the <a href="http://site-3rajshmt5-beefers.vercel.app/">first commit</a> and the <a href="http://site-git-v6-beefers.vercel.app/">latest commit</a>.</p>
-  <h2 id="justification">Justification</h2>
-  <p>The reason I have chosen to rewrite my website so many times is due to this simple reason - I am a perfectionist. I always find a new flaw in my site, or a new framework that would fit my site better than whatever it is currently using. Thus, I run the dreaded command:</p>
-  <pre is:raw="" class="astro-code" style="background-color: var(--astro-code-color-background); overflow-x: auto;"><code><span class="line"><span style="color: var(--astro-code-color-text)">git switch --orphan </span><span style="color: var(--astro-code-token-keyword)">&#x3C;</span><span style="color: var(--astro-code-color-text)">version</span><span style="color: var(--astro-code-token-keyword)">></span></span></code></pre>
-  <p>And get on my way, coding a new version of this website.</p>
-  <h2 id="version-table">Version table</h2>
-  <table>
-    <thead>
-      <tr>
-        <th>Version</th>
-        <th>First commit</th>
-        <th>Latest commit</th>
-        <th>Summary</th>
-      </tr>
-    </thead>
-    <tbody>
-      <tr>
-        <td>Legacy</td>
-        <td><a href="http://github.com/Beefers/site/tree/legacy">Here</a></td>
-        <td>See source</td>
-        <td>HTML/CSS/JS, first dive into webdev.</td>
-      </tr>
-      <tr>
-        <td>Version 1</td>
-        <td><a href="http://rem-my-github-io-kp5pssc3h-rem-my.vercel.app/">Here</a></td>
-        <td><a href="http://site-git-v1-beefers.vercel.app/">Here</a></td>
-        <td>Direct port of Legacy to SvelteKit.</td>
-      </tr>
-      <tr>
-        <td>Version 2</td>
-        <td><a href="http://site-9zgoiir3s-rem-my.vercel.app/">Here</a></td>
-        <td><a href="http://site-git-v2-beefers.vercel.app/">Here</a></td>
-        <td>Explored “advanced” CSS styling, written with SvelteKit.</td>
-      </tr>
-      <tr>
-        <td>Version 3</td>
-        <td><a href="http://site-jlflzgxce-beefers.vercel.app/">Here</a></td>
-        <td><a href="http://site-git-v3-beefers.vercel.app/">Here</a></td>
-        <td>Dead within 6 commits. Used Svelte and Astro.</td>
-      </tr>
-      <tr>
-        <td>Version 4</td>
-        <td><a href="http://site-jh5zqygpw-beefers.vercel.app/">Here</a></td>
-        <td><a href="http://site-git-v4-beefers.vercel.app/">Here</a></td>
-        <td>Started to take webdev seriously, and wanted my own internet space. Written with SolidJS, WindiCSS and Vite.</td>
-      </tr>
-      <tr>
-        <td>Version 5</td>
-        <td><a href="http://site-avz3yew0y-beefers.vercel.app/">Here</a></td>
-        <td><a href="http://site-git-v5-beefers.vercel.app/">Here</a></td>
-        <td>Supposed to be the rewrite to end all rewrites - look how that went… Written with SolidJS, TypeScript, WindiCSS and Vite.</td>
-      </tr>
-      <tr>
-        <td>Version 6</td>
-        <td><a href="http://site-3rajshmt5-beefers.vercel.app/">Here</a></td>
-        <td><a href="http://site-git-v6-beefers.vercel.app/">Here</a></td>
-        <td>The current version! Written with Astro, and styled using the Catppuccin colour scheme.</td>
-      </tr>
-    </tbody>
-  </table> -->
   </span> </main>
 </span>
 </body>
-<!-- Mirrored from beefers.dev/articles/WhyRewriteYourSite by HTTrack Website Copier/3.x [XR&CO'2014], Thu, 20 Apr 2023 07:25:07 GMT -->
 </html>
