@@ -1,0 +1,4 @@
+This is a Brave Creators publisher verification file.
+
+Domain: snupai.me
+Token: a12f10eb3c9874e01b9e7a59a0cd652abeb8a0ad3424407f1af5019f13b78981
