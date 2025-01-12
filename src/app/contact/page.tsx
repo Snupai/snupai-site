@@ -1,5 +1,25 @@
 import Link from "next/link";
 import Navigation from "~/components/Navigation";
+import { type Metadata } from "next";
+
+export const metadata: Metadata = {
+  title: "Contact Snupai",
+  description: "Get in touch with me through various social platforms.",
+  openGraph: {
+    title: "Contact Snupai",
+    description: "Get in touch with me through various social platforms.",
+    url: "https://snupai.me/contact",
+    siteName: "Snupai's Website",
+    locale: "en_US",
+    type: "website",
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "Contact Snupai",
+    description: "Get in touch with me through various social platforms.",
+    creator: "@Snupai",
+  },
+};
 
 export default function ContactPage() {
   return (
