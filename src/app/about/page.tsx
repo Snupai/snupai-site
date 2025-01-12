@@ -1,4 +1,24 @@
 import Navigation from "~/components/Navigation";
+import { type Metadata } from "next";
+
+export const metadata: Metadata = {
+  title: "About Snupai",
+  description: "Learn more about me - a student, programmer, and automation engineer.",
+  openGraph: {
+    title: "About Snupai",
+    description: "Learn more about me - a student, programmer, and automation engineer.",
+    url: "https://snupai.me/about",
+    siteName: "Snupai's Website",
+    locale: "en_US",
+    type: "website",
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "About Snupai",
+    description: "Learn more about me - a student, programmer, and automation engineer.",
+    creator: "@Snupai",
+  },
+};
 
 export default function AboutPage() {
   return (
