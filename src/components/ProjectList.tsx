@@ -8,7 +8,6 @@ type Repo = {
   description: string;
   language: string;
   stargazers_count: number;
-  pushed_at: string;
   last_commit: string;
   html_url: string;
   owner: {

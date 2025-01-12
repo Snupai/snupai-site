@@ -24,23 +24,45 @@ const SHOUTOUT_REPO_LIST = [
   }
 ];
 
+type GitHubRepo = {
+  id: number;
+  name: string;
+  description: string | null;
+  default_branch: string;
+  html_url: string;
+  language: string;
+  stargazers_count: number;
+  owner: {
+    login: string;
+    html_url: string;
+  };
+};
+
+type GitHubCommit = {
+  commit: {
+    committer: {
+      date: string;
+    };
+  };
+};
+
 async function getReposData(repoList: typeof REPO_LIST) {
   const repoPromises = repoList.map(async ({ path, description }) => {
     // Get repo info
     const repoRes = await fetch(`https://api.github.com/repos/${path}`, {
       next: { revalidate: 3600 }
     });
-    const repoData = await repoRes.json();
+    const repoData = (await repoRes.json()) as GitHubRepo;
 
     // Get latest commit to default branch
     const commitRes = await fetch(`https://api.github.com/repos/${path}/commits/${repoData.default_branch}`, {
       next: { revalidate: 3600 }
     });
-    const commitData = await commitRes.json();
+    const commitData = (await commitRes.json()) as GitHubCommit;
 
     return {
       ...repoData,
-      description: description || repoData.description, // Use custom description if provided, fall back to GitHub description
+      description: description || repoData.description || '', // Provide fallback for null description
       last_commit: commitData.commit.committer.date
     };
   });

@@ -31,14 +31,14 @@ export default function AboutPage() {
         
         <div className="max-w-3xl text-lg space-y-6">
           <p>
-            Hi. I'm a student at University of Applied Sciences Kaiserslautern in Germany, actively studying applied computer science.
+            Hi. I&apos;m a student at University of Applied Sciences Kaiserslautern in Germany, actively studying applied computer science.
           </p>
 
           <div className="rounded-xl bg-mocha-surface p-6 space-y-4">
             <h2 className="text-2xl font-bold text-mocha-flamingo">So, who am I?</h2>
             <p>
               I am Snupai. I am 22 years old. I code from time to time. 
-              I am a huge fan of AI and machine learning. I am a noob if it comes to programming but love playing around.
+              I&apos;m a huge fan of AI and machine learning. I am a noob if it comes to programming but love playing around.
               My code is probably bad but I am having fun.
             </p>
           </div>
