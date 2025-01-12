@@ -1,5 +1,6 @@
 import Navigation from "~/components/Navigation";
 import ProjectList from "~/components/ProjectList";
+import { type Metadata } from "next";
 
 const REPO_LIST = [
   {
@@ -46,6 +47,25 @@ async function getReposData(repoList: typeof REPO_LIST) {
   
   return Promise.all(repoPromises);
 }
+
+export const metadata: Metadata = {
+  title: "Snupai's Projects",
+  description: "Check out my projects and other cool projects I recommend.",
+  openGraph: {
+    title: "Snupai's Projects",
+    description: "Check out my projects and other cool projects I recommend.",
+    url: "https://snupai.me/projects",
+    siteName: "Snupai's Website",
+    locale: "en_US",
+    type: "website",
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "Snupai's Projects",
+    description: "Check out my projects and other cool projects I recommend.",
+    creator: "@Snupai",
+  },
+};
 
 export default async function ProjectsPage() {
   const repos = await getReposData(REPO_LIST);
