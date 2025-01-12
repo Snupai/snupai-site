@@ -62,7 +62,7 @@ async function getReposData(repoList: typeof REPO_LIST) {
 
     return {
       ...repoData,
-      description: description || repoData.description || '', // Provide fallback for null description
+      description: description ?? repoData.description ?? '', // Provide fallback for null description
       last_commit: commitData.commit.committer.date
     };
   });

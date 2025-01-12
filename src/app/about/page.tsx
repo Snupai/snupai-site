@@ -61,7 +61,7 @@ export default function AboutPage() {
             <p>
               Snupai is a nickname I got from my friends. I am not sure why but it stuck.
               The name is a mix between Snu Snu and Senpai. Senpai is a Japanese word for older brother.
-              While Snu Snu is... uh well... I won't explain it here.
+              While Snu Snu is... uh well... I won&apos;t explain it here.
             </p>
           </div>
         </div>
