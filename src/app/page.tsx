@@ -1,5 +1,25 @@
 import Link from "next/link";
 import Navigation from "~/components/Navigation";
+import { type Metadata } from "next";
+
+export const metadata: Metadata = {
+  title: "Snupai's Website",
+  description: "Welcome to my personal website. For fun :3",
+  openGraph: {
+    title: "Snupai's Website",
+    description: "Welcome to my personal website. For fun :3",
+    url: "https://snupai.me",
+    siteName: "Snupai's Website",
+    locale: "en_US",
+    type: "website",
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "Snupai's Website",
+    description: "Welcome to my personal website. For fun :3",
+    creator: "@Snupai",
+  },
+};
 
 export default function HomePage() {
   return (
