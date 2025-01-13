@@ -27,8 +27,9 @@ export default function HomePage() {
     <main className="flex min-h-screen flex-col bg-mocha">
       <Navigation currentPage="home" />
       <div className="container mx-auto flex flex-col items-center justify-center gap-12 px-4 py-16">
-        <h1 className="text-5xl font-extrabold tracking-tight sm:text-[5rem]">
-          Welcome to <ClickableTitle text="snupai.me" url="https://snupai.me" />
+        <h1 className="text-center text-4xl font-extrabold tracking-tight sm:text-5xl md:text-[5rem]">
+          <span className="block">Welcome to</span>
+          <ClickableTitle text="snupai.me" url="https://snupai.me" />
         </h1>
         <p className="text-center text-xl">
           This is my personal website. For fun :3
