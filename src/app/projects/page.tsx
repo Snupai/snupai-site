@@ -14,6 +14,26 @@ const REPO_LIST = [
   {
     path: 'Snupai/MultipackParser',
     description: 'A tool for parsing and managing palettizing data for work internal Palettizing robots.'
+  },
+  {
+    path: 'Snupai/Uebungen-Csharp-Closures',
+    description: 'A collection of exercises for learning C#.'
+  },
+  {
+    path: 'Snupai/Uebungen-etc',
+    description: 'Even more exercises for learning C#.'
+  },
+  {
+    path: 'Snupai/tcp-ip-comm',
+    description: 'A simple TCP/IP communication test for C#.'
+  },
+  {
+    path: 'Snupai/TicTacToe',
+    description: 'My final exam for school. A simple TicTacToe game for C#.'
+  },
+  {
+    path: 'Snupai/TicTacToeTcpIpReceiver',
+    description: 'The TCP/IP communication receiver for the TicTacToe game.'
   }
 ];
 
@@ -21,6 +41,10 @@ const SHOUTOUT_REPO_LIST = [
   {
     path: 'SebiAi/custom-nothing-glyph-tools',
     description: 'A tool for creating custom nothing glyphs for Nothing Phones.'
+  },
+  {
+    path: 'SebiAi/GlyphVisualizer',
+    description: 'A tool for visualizing glyphs for Nothing Phones.'
   }
 ];
 
@@ -32,6 +56,7 @@ type GitHubRepo = {
   html_url: string;
   language: string;
   stargazers_count: number;
+  private: boolean;
   owner: {
     login: string;
     html_url: string;
@@ -48,26 +73,52 @@ type GitHubCommit = {
 
 async function getReposData(repoList: typeof REPO_LIST) {
   const repoPromises = repoList.map(async ({ path, description }) => {
-    // Get repo info
-    const repoRes = await fetch(`https://api.github.com/repos/${path}`, {
-      next: { revalidate: 3600 }
-    });
-    const repoData = (await repoRes.json()) as GitHubRepo;
+    try {
+      // Get repo info
+      const repoRes = await fetch(`https://api.github.com/repos/${path}`, {
+        next: { revalidate: 3600 }
+      });
 
-    // Get latest commit to default branch
-    const commitRes = await fetch(`https://api.github.com/repos/${path}/commits/${repoData.default_branch}`, {
-      next: { revalidate: 3600 }
-    });
-    const commitData = (await commitRes.json()) as GitHubCommit;
+      // If repo is not found or not public, skip it
+      if (!repoRes.ok) {
+        console.warn(`Repository ${path} is not accessible: ${repoRes.statusText}`);
+        return null;
+      }
 
-    return {
-      ...repoData,
-      description: description ?? repoData.description ?? '', // Provide fallback for null description
-      last_commit: commitData.commit.committer.date
-    };
+      const repoData = (await repoRes.json()) as GitHubRepo;
+
+      // Check if repo is private
+      if (repoData.private) {
+        console.warn(`Repository ${path} is private`);
+        return null;
+      }
+
+      // Get latest commit to default branch
+      const commitRes = await fetch(`https://api.github.com/repos/${path}/commits/${repoData.default_branch}`, {
+        next: { revalidate: 3600 }
+      });
+
+      if (!commitRes.ok) {
+        console.warn(`Could not fetch commits for ${path}: ${commitRes.statusText}`);
+        return null;
+      }
+
+      const commitData = (await commitRes.json()) as GitHubCommit;
+
+      return {
+        ...repoData,
+        description: description ?? repoData.description ?? '', // Provide fallback for null description
+        last_commit: commitData.commit.committer.date
+      };
+    } catch (error) {
+      console.error(`Error fetching data for ${path}:`, error);
+      return null;
+    }
   });
   
-  return Promise.all(repoPromises);
+  const results = await Promise.all(repoPromises);
+  // Filter out null results (private/inaccessible repos)
+  return results.filter((repo): repo is NonNullable<typeof repo> => repo !== null);
 }
 
 export const metadata: Metadata = {
