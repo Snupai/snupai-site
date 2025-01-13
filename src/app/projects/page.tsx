@@ -156,11 +156,11 @@ export default async function ProjectsPage() {
       <Navigation currentPage="projects" />
       <div className="container mx-auto flex flex-col items-center justify-center gap-8 px-4 py-16">
         <h1 className="text-5xl font-extrabold tracking-tight sm:text-[4rem]">
-          My <span className="text-mocha-rosewater">Projects</span>
+          My <span className="title-highlight">Projects</span>
         </h1>
         <ProjectList initialRepos={repos} />
         <h1 className="text-5xl font-extrabold tracking-tight sm:text-[4rem]">
-          <span className="text-mocha-rosewater">Projects</span> I love and recommend
+          <span className="title-highlight">Projects</span> I love and recommend
         </h1>
         <ProjectList initialRepos={shoutout_repos} />
       </div>
