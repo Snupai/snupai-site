@@ -14,11 +14,12 @@ const contactFormSchema = z.object({
 type ContactFormData = z.infer<typeof contactFormSchema>;
 
 export default function ContactForm() {
-  const { register, handleSubmit, formState: { errors } } = useForm<ContactFormData>({
+  const { register, handleSubmit, formState: { errors }, reset } = useForm<ContactFormData>({
     resolver: zodResolver(contactFormSchema)
   });
 
-  const [status, setStatus] = useState<'idle' | 'loading' | 'success' | 'error'>('idle');
+  const [status, setStatus] = useState<'idle' | 'loading' | 'success' | 'error' | 'rate-limited'>('idle');
+  const [retryAfter, setRetryAfter] = useState<number | null>(null);
 
   const onSubmit = async (data: ContactFormData) => {
     setStatus('loading');
@@ -31,10 +32,17 @@ export default function ContactForm() {
         body: JSON.stringify(data),
       });
 
+      if (response.status === 429) {
+        const responseData = await response.json() as { retryAfter: number };
+        setRetryAfter(responseData.retryAfter);
+        setStatus('rate-limited');
+        return;
+      }
+
       if (!response.ok) throw new Error('Failed to send message');
       
+      reset(); // Clear the form
       setStatus('success');
-      setTimeout(() => setStatus('idle'), 3000);
     } catch (error) {
       console.error('Contact form error:', error);
       setStatus('error');
@@ -44,6 +52,16 @@ export default function ContactForm() {
 
   const inputClasses = "w-full p-2 rounded-lg bg-mocha-surface border border-mocha-overlay0 focus:border-mocha-lavender focus:outline-none focus:ring-1 focus:ring-mocha-lavender transition-colors";
   const errorClasses = "text-sm text-mocha-red mt-1";
+
+  if (status === 'success') {
+    return (
+      <div className="text-center space-y-4 p-8 bg-mocha-surface rounded-lg">
+        <div className="text-6xl mb-4">✉️</div>
+        <h3 className="text-2xl font-bold text-mocha-green">Thanks for contacting me!</h3>
+        <p className="text-mocha-text">I&apos;ll get back to you as soon as possible.</p>
+      </div>
+    );
+  }
 
   return (
     <div className="flex justify-center items-center w-full">
@@ -85,11 +103,16 @@ export default function ContactForm() {
           {status === 'loading' ? 'Sending...' : 'Send Message'}
         </button>
 
-        {status === 'success' && (
-          <p className="text-mocha-green text-center">Message sent successfully!</p>
+        {status === 'rate-limited' && (
+          <p className="text-mocha-red text-center">
+            Too many messages sent. Please try again in {retryAfter} minutes.
+          </p>
         )}
+        
         {status === 'error' && (
-          <p className="text-mocha-red text-center">Failed to send message. Please try again.</p>
+          <p className="text-mocha-red text-center">
+            Failed to send message. Please try again.
+          </p>
         )}
       </form>
     </div>

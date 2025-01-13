@@ -1,5 +1,5 @@
 import { type NextRequest } from "next/server";
-import nodemailer, { type TransportOptions } from "nodemailer";
+import nodemailer from "nodemailer";
 import { z } from "zod";
 import { env } from "../../../env.js";
 
@@ -9,43 +9,20 @@ const contactFormSchema = z.object({
   message: z.string().min(10, "Message must be at least 10 characters"),
 });
 
-// Define the transport config type
-type SMTPTransport = TransportOptions & {
-  host: string;
-  port: number;
-  secure: boolean;
-  auth: {
-    user: string;
-    pass: string;
-  };
-  authMethod: string;
-  tls: {
-    rejectUnauthorized: boolean;
-    minVersion: string;
-  };
-  debug: boolean;
-  logger: boolean;
-};
-
 // Create the transport config
-const transportConfig: SMTPTransport = {
-  host: "smtp.ionos.de",
-  port: 587,
+const transporter = nodemailer.createTransport({
+  host: env.SMTP_HOST,
+  port: env.SMTP_PORT,
   secure: false,
   auth: {
-    user: "contact@snupai.me",
+    user: env.SMTP_USER,
     pass: env.SMTP_PASS
   },
-  authMethod: 'PLAIN',
   tls: {
     rejectUnauthorized: false,
     minVersion: 'TLSv1.2'
-  },
-  debug: true,
-  logger: true
-};
-
-const transporter = nodemailer.createTransport(transportConfig);
+  }
+});
 
 export async function POST(request: NextRequest) {
   try {
@@ -61,32 +38,49 @@ export async function POST(request: NextRequest) {
 
     const { name, email, message } = result.data;
 
-    await transporter.sendMail({
-      from: `"Contact Form" <${env.SMTP_USER}>`,
-      to: "nya@snupai.me",
-      subject: `New Contact Form Submission from ${name}`,
-      text: `
+    try {
+      await transporter.sendMail({
+        from: `"Contact Form" <${env.SMTP_USER}>`,
+        to: env.SMTP_TO_ADDRESS,
+        subject: `New Contact Form Submission from ${name}`,
+        text: `
 Name: ${name}
 Email: ${email}
 
 Message:
 ${message}
-      `,
-      html: `
+        `,
+        html: `
 <h2>New Contact Form Submission</h2>
 <p><strong>Name:</strong> ${name}</p>
 <p><strong>Email:</strong> ${email}</p>
 <br>
 <p><strong>Message:</strong></p>
 <p>${message.replace(/\n/g, '<br>')}</p>
-      `,
-    });
+        `,
+      });
 
-    return Response.json({ success: true });
+      return Response.json({ success: true });
+    } catch (emailError) {
+      console.error('Email sending error:', emailError);
+      
+      // Check for rate limit or quota exceeded
+      if (typeof emailError === 'object' && 
+          emailError !== null && 
+          'responseCode' in emailError && 
+          emailError.responseCode === 450) {
+        return Response.json(
+          { error: "Email service temporarily unavailable. Please try again later." },
+          { status: 503 }
+        );
+      }
+
+      throw emailError; // Re-throw for general error handling
+    }
   } catch (error) {
     console.error('Contact form error:', error);
     return Response.json(
-      { error: "Failed to send message" },
+      { error: "Failed to send message. Please try again later." },
       { status: 500 }
     );
   }
