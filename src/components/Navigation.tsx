@@ -14,7 +14,7 @@ export default function Navigation({ currentPage }: NavProps) {
     return `${baseClass} ${
       isActive 
         ? "text-mocha-flamingo bg-mocha-surface/80" 
-        : "hover:bg-mocha-surface/50 hover:text-mocha-rosewater"
+        : "hover:bg-mocha-surface/50 highlight-text"
     }`;
   };
 
