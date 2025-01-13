@@ -48,19 +48,15 @@ export default function ClickableTitle({ text, url }: ClickableTitleProps) {
     const progress = index / sparkleCount;
     const baseX = progress * width;
     
-    // Increase horizontal spread
-    const randomX = baseX + (Math.random() * 40 - 20); // -20 to +20px horizontal spread
-    
-    // Create more vertical spread and push sparkles outward
-    const verticalSpread = Math.random() * 60 - 30; // -30 to +30px
-    // Add a minimum distance from center to push sparkles outward
+    const randomX = baseX + (Math.random() * 40 - 20);
+    const verticalSpread = Math.random() * 60 - 30;
     const minDistance = 16;
     const randomY = (verticalSpread > 0 ? minDistance : -minDistance) + verticalSpread;
     
     const scale = Math.random() * 0.4 + 0.8;
     const color = colors[Math.floor(Math.random() * colors.length)] ?? 'text-mocha-pink';
-    const delay = Math.random() * 2000;
-    const duration = 1000 + Math.random() * 1500;
+    const delay = index * 20;
+    const duration = 2000 + Math.random() * 1000;
 
     return {
       id: index,

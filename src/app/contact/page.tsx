@@ -1,5 +1,6 @@
 import Navigation from "~/components/Navigation";
 import { type Metadata } from "next";
+import ContactForm from "~/components/ContactForm";
 
 export const metadata: Metadata = {
   title: "Contact Snupai",
@@ -50,7 +51,7 @@ export default function ContactPage() {
                   nya@snupai.me
                 </a>
               </div>
-              {/* TODO: Add functioning contact form. */}
+              <ContactForm />
 
               <div className="rounded-lg bg-mocha-mantle p-4">
                 <h3 className="font-bold">Location</h3>
