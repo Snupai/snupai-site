@@ -34,6 +34,14 @@ const REPO_LIST = [
   {
     path: 'Snupai/TicTacToeTcpIpReceiver',
     description: 'The TCP/IP communication receiver for the TicTacToe game.'
+  },
+  {
+    path: 'Snupai/some_bot',
+    description: 'A simple Discord bot just for fun.'
+  },
+  {
+    path: 'Snupai/visualize_MultiPack',
+    description: 'A tool for visualizing palettizing data for work internal Palettizing robots.'
   }
 ];
 
