@@ -14,24 +14,24 @@ export default {
             transform: 'scale(0) rotate(0deg)',
             opacity: '0'
           },
-          '20%': {
-            transform: 'scale(1) rotate(180deg)',
+          '5%': {
+            transform: 'scale(1) rotate(90deg)',
             opacity: '0.8'
           },
-          '35%': {
-            transform: 'scale(0.8) rotate(270deg)',
+          '25%': {
+            transform: 'scale(0.8) rotate(180deg)',
             opacity: '0.4'
           },
           '50%': {
             transform: 'scale(1.2) rotate(360deg)',
             opacity: '0.9'
           },
-          '65%': {
-            transform: 'scale(0.9) rotate(450deg)',
+          '75%': {
+            transform: 'scale(0.9) rotate(540deg)',
             opacity: '0.5'
           },
-          '80%': {
-            transform: 'scale(1) rotate(540deg)',
+          '95%': {
+            transform: 'scale(1) rotate(680deg)',
             opacity: '0.8'
           },
           '100%': { 
