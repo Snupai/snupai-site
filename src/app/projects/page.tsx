@@ -16,7 +16,7 @@ const REPO_LIST = [
     description: 'A tool for parsing and managing palettizing data for work internal Palettizing robots.'
   },
   {
-    path: 'Snupai/Uebungen-Csharp-Closures',
+    path: 'Snupai/Uebungen-Csharp-Clos',
     description: 'A collection of exercises for learning C#.'
   },
   {
