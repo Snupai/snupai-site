@@ -51,7 +51,6 @@ export default function ContactPage() {
                   nya@snupai.me
                 </a>
               </div>
-              <ContactForm />
 
               <div className="rounded-lg bg-mocha-mantle p-4">
                 <h3 className="font-bold">Location</h3>
@@ -96,6 +95,11 @@ export default function ContactPage() {
                 </div>
               </div>
             </div>
+          </div>
+
+          <div className="rounded-xl bg-mocha-surface p-6 space-y-4">
+            <h2 className="text-2xl font-bold highlight-text text-center">Contact via Form</h2>
+            <ContactForm />
           </div>
         </div>
       </div>
