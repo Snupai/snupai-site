@@ -60,11 +60,11 @@ export default function ProjectList({ initialRepos }: { initialRepos: Repo[] }) 
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
         {sortedRepos.map(repo => (
-          <div key={repo.id} className="rounded-xl bg-mocha-surface p-6 space-y-4">
-            <div className="flex justify-between items-start">
-              <div className="space-y-1">
-                <h3 className="text-2xl font-bold text-mocha-flamingo">{repo.name}</h3>
-                <p className="text-sm text-mocha-subtext0">
+          <div key={repo.id} className="rounded-xl bg-mocha-surface p-6 space-y-4 min-w-[320px]">
+            <div className="flex justify-between items-start gap-4">
+              <div className="space-y-1 min-w-0">
+                <h3 className="text-2xl font-bold text-mocha-flamingo truncate">{repo.name}</h3>
+                <p className="text-sm text-mocha-subtext0 truncate">
                   by{' '}
                   <a 
                     href={repo.owner.html_url}
@@ -76,7 +76,7 @@ export default function ProjectList({ initialRepos }: { initialRepos: Repo[] }) 
                   </a>
                 </p>
               </div>
-              <div className="flex items-center gap-2">
+              <div className="flex items-center gap-2 flex-shrink-0">
                 <span className="text-mocha-yellow">★</span>
                 <span className="text-sm">{repo.stargazers_count}</span>
               </div>

@@ -59,7 +59,7 @@ export default function ContactPage() {
 
               <div className="rounded-lg bg-mocha-mantle p-4">
                 <h3 className="font-bold">Social Media</h3>
-                <div className="flex gap-4 mt-2">
+                <div className="flex flex-col sm:flex-row gap-2 sm:gap-4 mt-2">
                   <div>
                     Discord: <a 
                       href="https://discord.com/users/239809113125552129/"
