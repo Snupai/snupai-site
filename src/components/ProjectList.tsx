@@ -70,7 +70,7 @@ export default function ProjectList({ initialRepos }: { initialRepos: Repo[] }) 
                     href={repo.owner.html_url}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="text-mocha-rosewater hover:text-mocha-flamingo"
+                    className="highlight-text"
                   >
                     @{repo.owner.login}
                   </a>
