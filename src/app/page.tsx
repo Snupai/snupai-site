@@ -27,7 +27,7 @@ export default function HomePage() {
       <Navigation currentPage="home" />
       <div className="container mx-auto flex flex-col items-center justify-center gap-12 px-4 py-16">
         <h1 className="text-5xl font-extrabold tracking-tight sm:text-[5rem]">
-          Welcome to <span className="text-mocha-rosewater">snupai-site</span>
+          Welcome to <span className="title-highlight">snupai-site</span>
         </h1>
         <p className="text-center text-xl">
           This is my personal website. For fun :3
