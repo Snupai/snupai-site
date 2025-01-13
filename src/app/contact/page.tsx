@@ -50,6 +50,7 @@ export default function ContactPage() {
                   nya@snupai.me
                 </a>
               </div>
+              {/* TODO: Add functioning contact form. */}
 
               <div className="rounded-lg bg-mocha-mantle p-4">
                 <h3 className="font-bold">Location</h3>
