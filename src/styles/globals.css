@@ -115,3 +115,24 @@
   .hover\:text-mocha-lavender:hover { color: var(--lavender); }
 }
 
+.mask-gradient {
+  mask-image: linear-gradient(to bottom,
+    rgba(0, 0, 0, 1) 0%,
+    rgba(0, 0, 0, 1) 22%,
+    rgba(0, 0, 0, 0.98) 24%,
+    rgba(0, 0, 0, 0.85) 26%,
+    rgba(0, 0, 0, 0.6) 28%,
+    rgba(0, 0, 0, 0.2) 32%,
+    rgba(0, 0, 0, 0) 38%
+  );
+  -webkit-mask-image: linear-gradient(to bottom,
+    rgba(0, 0, 0, 1) 0%,
+    rgba(0, 0, 0, 1) 22%,
+    rgba(0, 0, 0, 0.98) 24%,
+    rgba(0, 0, 0, 0.85) 26%,
+    rgba(0, 0, 0, 0.6) 28%,
+    rgba(0, 0, 0, 0.2) 32%,
+    rgba(0, 0, 0, 0) 38%
+  );
+}
+
