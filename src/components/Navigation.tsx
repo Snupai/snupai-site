@@ -20,8 +20,10 @@ export default function Navigation({ currentPage }: NavProps) {
 
   return (
     <div className="relative">
-      <nav className="fixed top-0 left-0 right-0 h-16 bg-mocha-mantle/95 backdrop-blur-sm z-50">
-        <div className="container mx-auto px-2 sm:px-4 h-full">
+      <nav className="fixed top-0 left-0 right-0 h-16 z-50">
+        <div className="absolute inset-0 bg-mocha-mantle/95" />
+        <div className="absolute inset-0 backdrop-blur-sm [mask-image:linear-gradient(to_top,transparent,rgba(0,0,0,0.2)_1%,rgba(0,0,0,0.3)_10%,rgba(0,0,0,0.5)_30%,rgba(0,0,0,0.8)_60%,black_85%,black)]" />
+        <div className="container mx-auto px-2 sm:px-4 h-full relative">
           <div className="flex items-center justify-center space-x-2 sm:space-x-4 h-full">
             <Link href="/" className={getLinkClassName('home')}>Home</Link>
             <Link href="/about" className={getLinkClassName('about')}>About</Link>
