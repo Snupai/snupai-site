@@ -34,9 +34,9 @@ export default function HomePage() {
         <p className="max-w-3xl text-center text-lg space-y-6">
           Oh, you found my website.
           <br />
-          I'm not sure if there's anything worth looking at here. But feel free to look around.
+          I&apos;m not sure if there&apos;s anything worth looking at here. But feel free to look around.
           <br />
-          <span className="opacity-0 hover:opacity-100 transition-opacity duration-300">You're amazing and deserve all the headpats!<br/>Have a wonderful day filled with joy and happiness! ❤️</span>
+          <span className="opacity-0 hover:opacity-100 transition-opacity duration-300">You&apos;re amazing and deserve all the headpats!<br/>Have a wonderful day filled with joy and happiness! ❤️</span>
         </p>
         <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 md:gap-8">
           <Link
