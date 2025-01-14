@@ -1,4 +1,3 @@
-import Navigation from "~/components/Navigation";
 import { type Metadata } from "next";
 import ContactForm from "~/components/ContactForm";
 
@@ -23,8 +22,7 @@ export const metadata: Metadata = {
 
 export default function ContactPage() {
   return (
-    <main className="flex min-h-screen flex-col bg-mocha">
-      <Navigation currentPage="contact" />
+    <main className="flex flex-col">
       <div className="container mx-auto flex flex-col items-center justify-center gap-8 px-4 py-16">
         <h1 className="text-5xl font-extrabold tracking-tight sm:text-[4rem]">
           Contact <span className="title-highlight">Snupai</span>

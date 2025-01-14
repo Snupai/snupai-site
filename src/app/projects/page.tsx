@@ -1,4 +1,3 @@
-import Navigation from "~/components/Navigation";
 import ProjectList from "~/components/ProjectList";
 import { type Metadata } from "next";
 
@@ -152,8 +151,7 @@ export default async function ProjectsPage() {
   const repos = await getReposData(REPO_LIST);
   const shoutout_repos = await getReposData(SHOUTOUT_REPO_LIST);
   return (
-    <main className="flex min-h-screen flex-col bg-mocha">
-      <Navigation currentPage="projects" />
+    <main className="flex flex-col">
       <div className="container mx-auto flex flex-col items-center justify-center gap-8 px-4 py-16">
         <h1 className="text-5xl font-extrabold tracking-tight sm:text-[4rem]">
           My <span className="title-highlight">Projects</span>
