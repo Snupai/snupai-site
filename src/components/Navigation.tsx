@@ -1,14 +1,30 @@
 'use client';
 
 import Link from "next/link";
+import { usePathname } from 'next/navigation';
 
-type NavProps = {
-  currentPage: 'home' | 'about' | 'projects' | 'contact';
-};
+type PageType = 'home' | 'about' | 'projects' | 'contact';
 
-export default function Navigation({ currentPage }: NavProps) {
+export default function Navigation() {
+  const pathname = usePathname();
+  
+  const getCurrentPage = (): PageType => {
+    switch (pathname) {
+      case '/':
+        return 'home';
+      case '/about':
+        return 'about';
+      case '/projects':
+        return 'projects';
+      case '/contact':
+        return 'contact';
+      default:
+        return 'home';
+    }
+  };
+
   const getLinkClassName = (page: string) => {
-    const isActive = currentPage === page;
+    const isActive = getCurrentPage() === page;
     const baseClass = "px-2 sm:px-6 py-2 rounded-full text-lg font-medium transition-all duration-300";
     
     return `${baseClass} ${
