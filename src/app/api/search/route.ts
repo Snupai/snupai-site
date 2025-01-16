@@ -5,12 +5,12 @@ import path from 'path'
 function countMatches(content: string, query: string): number {
   if (!query) return 0
   const regex = new RegExp(query, 'gi')
-  return (content.match(regex) || []).length
+  return (content.match(regex) ?? []).length
 }
 
 function extractSearchableContent(content: string): string {
   // Extract all text content that might be searchable
-  const allMatches = content.match(/['"`]([^'"`]+)['"`]/g) || []
+  const allMatches = content.match(/['"`]([^'"`]+)['"`]/g) ?? []
   return allMatches
     .map(str => str.slice(1, -1))
     .filter(str => 
@@ -56,7 +56,7 @@ export async function GET(request: Request) {
       try {
         const rawContent = fs.readFileSync(filePath, 'utf8')
         content = extractSearchableContent(rawContent)
-      } catch (e) {
+      } catch (error) {
         console.warn(`Could not read file: ${filePath}`)
       }
 
@@ -71,18 +71,18 @@ export async function GET(request: Request) {
             .replace(/#/g, '')
             .trim()
         }
-      } catch (e) {
+      } catch (error) {
         // MDX file doesn't exist or couldn't be read
       }
 
-      const matches = countMatches(content, query || '')
+      const matches = countMatches(content, query ?? '')
 
       return {
         path: page.path,
         name: page.path === '/' ? 'Home' : page.path.slice(1).charAt(0).toUpperCase() + page.path.slice(2),
         description: page.description,
         matches: matches,
-        content // Keep the content for searching but don't display it
+        content
       }
     }))
 
