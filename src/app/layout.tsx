@@ -4,7 +4,7 @@ import { GeistSans } from "geist/font/sans";
 import { type Metadata } from "next";
 import { TRPCReactProvider } from "~/trpc/react";
 import Footer from "~/components/Footer";
-import Navigation from "~/components/Navigation";
+import DynamicIsland from "~/components/dynamic-island";
 
 export const metadata: Metadata = {
   metadataBase: new URL("https://snupai.me"),
@@ -24,7 +24,7 @@ export default function RootLayout({
       <body>
         <TRPCReactProvider>
           <div className="flex flex-col min-h-screen bg-mocha">
-            <Navigation />
+            <DynamicIsland />
             <div className="flex-grow">
               {children}
             </div>
