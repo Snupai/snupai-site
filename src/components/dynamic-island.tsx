@@ -145,8 +145,6 @@ export default function DynamicIsland() {
                   onChange={handleSearchChange}
                   onKeyDown={handleSearchKeyDown}
                   aria-label="Search navigation"
-                  aria-expanded={isExpanded}
-                  role="searchbox"
                 />
               </motion.div>
 
@@ -194,7 +192,7 @@ export default function DynamicIsland() {
                     exit={{ y: -20, opacity: 0 }}
                     className="text-center text-gray-400 py-4"
                   >
-                    No results found for "{searchQuery}"
+                    No results found for &quot;{searchQuery}&quot;
                   </motion.div>
                 )}
               </AnimatePresence>
