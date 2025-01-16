@@ -120,8 +120,8 @@ export default function DynamicIsland() {
           maxWidth: isExpanded ? 600 : 200,
           transition: {
             type: "spring",
-            damping: 20,
-            stiffness: 300
+            damping: 25,
+            stiffness: 250
           }
         }}
         style={{
