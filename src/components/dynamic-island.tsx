@@ -141,7 +141,7 @@ export default function DynamicIsland() {
             ) : (
               <Menu className="h-4 w-4 flex-shrink-0" />
             )}
-            <span className="text-sm font-medium truncate">Dynamic Menu</span>
+            <span className="text-sm font-medium truncate">Site Navigation</span>
           </div>
           <div className="flex items-center gap-4 flex-shrink-0">
             <Home 
