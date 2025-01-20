@@ -2,6 +2,9 @@ import "~/styles/globals.css";
 
 import { GeistSans } from "geist/font/sans";
 import { type Metadata } from "next";
+import { TRPCReactProvider } from "~/trpc/react";
+import Footer from "~/components/Footer";
+import Navigation from "~/components/Navigation";
 
 export const metadata: Metadata = {
   metadataBase: new URL("https://snupai.me"),
@@ -18,7 +21,17 @@ export default function RootLayout({
 }: Readonly<{ children: React.ReactNode }>) {
   return (
     <html lang="en" className={`${GeistSans.variable}`}>
-      <body>{children}</body>
+      <body>
+        <TRPCReactProvider>
+          <div className="flex flex-col min-h-screen bg-mocha">
+            <Navigation />
+            <div className="flex-grow">
+              {children}
+            </div>
+            <Footer />
+          </div>
+        </TRPCReactProvider>
+      </body>
     </html>
   );
 }

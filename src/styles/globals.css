@@ -34,6 +34,54 @@
   }
 }
 
+@layer components {
+  .highlight-text {
+    @apply text-mocha-rosewater hover:text-mocha-pink transition-colors;
+  }
+
+  .title-highlight {
+    @apply bg-clip-text text-transparent font-bold;
+    background-size: 200% auto;
+    animation: shine 3s linear infinite, rotate 8s ease-in-out infinite;
+    background-image: linear-gradient(
+      45deg,
+      var(--pink) 0%,
+      var(--sapphire) 25%,
+      var(--mauve) 50%,
+      var(--sky) 75%,
+      var(--pink) 100%
+    );
+    text-shadow: 0 0 20px rgba(245, 194, 231, 0.3);
+  }
+}
+
+@keyframes shine {
+  0% {
+    background-position: 0% center;
+  }
+  100% {
+    background-position: 200% center;
+  }
+}
+
+@keyframes rotate {
+  0% {
+    background-image: linear-gradient(45deg, var(--pink) 0%, var(--sapphire) 25%, var(--mauve) 50%, var(--sky) 75%, var(--pink) 100%);
+  }
+  25% {
+    background-image: linear-gradient(135deg, var(--pink) 0%, var(--sapphire) 25%, var(--mauve) 50%, var(--sky) 75%, var(--pink) 100%);
+  }
+  50% {
+    background-image: linear-gradient(225deg, var(--pink) 0%, var(--sapphire) 25%, var(--mauve) 50%, var(--sky) 75%, var(--pink) 100%);
+  }
+  75% {
+    background-image: linear-gradient(315deg, var(--pink) 0%, var(--sapphire) 25%, var(--mauve) 50%, var(--sky) 75%, var(--pink) 100%);
+  }
+  100% {
+    background-image: linear-gradient(405deg, var(--pink) 0%, var(--sapphire) 25%, var(--mauve) 50%, var(--sky) 75%, var(--pink) 100%);
+  }
+}
+
 @layer utilities {
   .bg-mocha {
     background-color: var(--base);
