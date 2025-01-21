@@ -42,7 +42,9 @@ export default function ProjectList({ initialRepos }: { initialRepos: Repo[] }) 
     <div className="flex flex-col gap-4 w-full max-w-5xl">
       <div className="flex justify-end gap-4">
         <div className="relative">
+          <label htmlFor="sort-projects" className="sr-only">Sort projects by</label>
           <select 
+            id="sort-projects"
             className="bg-mocha-surface px-4 py-2 pr-10 rounded-lg text-mocha-text appearance-none"
             value={sortBy}
             onChange={(e) => setSortBy(e.target.value)}
