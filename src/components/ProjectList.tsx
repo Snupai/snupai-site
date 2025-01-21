@@ -20,22 +20,9 @@ type Repo = {
 export default function ProjectList({ initialRepos }: { initialRepos: Repo[] }) {
   const [sortBy, setSortBy] = useState('lastCommit');
   const [mounted, setMounted] = useState(false);
-  const [isOpen, setIsOpen] = useState(false);
-  const dropdownRef = useRef<HTMLDivElement>(null);
   
   useEffect(() => {
     setMounted(true);
-  }, []);
-
-  useEffect(() => {
-    function handleClickOutside(event: MouseEvent) {
-      if (dropdownRef.current && !dropdownRef.current.contains(event.target as Node)) {
-        setIsOpen(false);
-      }
-    }
-
-    document.addEventListener('mousedown', handleClickOutside);
-    return () => document.removeEventListener('mousedown', handleClickOutside);
   }, []);
 
   const sortedRepos = [...initialRepos].sort((a, b) => {
