@@ -5,13 +5,17 @@ import { loggerLink, unstable_httpBatchStreamLink } from "@trpc/client";
 import { createTRPCReact } from "@trpc/react-query";
 import { useState } from "react";
 
-import { type AppRouter } from "~/server/api/root";
-import { transformer } from "./shared";
+import { type AppRouter } from "@/server/api/root";
+import { getUrl, transformer } from "./shared";
 
 export const api = createTRPCReact<AppRouter>();
 
-export function TRPCReactProvider(props: { children: React.ReactNode }) {
+export function TRPCReactProvider(props: {
+  children: React.ReactNode;
+  headers: Headers;
+}) {
   const [queryClient] = useState(() => new QueryClient());
+
   const [trpcClient] = useState(() =>
     api.createClient({
       links: [
@@ -21,11 +25,16 @@ export function TRPCReactProvider(props: { children: React.ReactNode }) {
             (op.direction === "down" && op.result instanceof Error),
         }),
         unstable_httpBatchStreamLink({
-          url: getBaseUrl() + "/api/trpc",
-          transformer
+          url: getUrl(),
+          headers() {
+            const heads = new Map(props.headers);
+            heads.set('x-trpc-source', 'react');
+            return Object.fromEntries(heads);
+          },
+          transformer,
         }),
       ],
-    })
+    }),
   );
 
   return (
@@ -35,10 +44,4 @@ export function TRPCReactProvider(props: { children: React.ReactNode }) {
       </api.Provider>
     </QueryClientProvider>
   );
-}
-
-function getBaseUrl() {
-  if (typeof window !== "undefined") return "";
-  if (process.env.VERCEL_URL) return `https://${process.env.VERCEL_URL}`;
-  return `http://localhost:${process.env.PORT ?? 3000}`;
 } 
