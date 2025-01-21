@@ -9,6 +9,7 @@ export const env = createEnv({
     SMTP_USER: z.string(),
     SMTP_PASS: z.string(),
     SMTP_TO_ADDRESS: z.string(),
+    GITHUB_TOKEN: z.string(),
   },
   client: {
     // NEXT_PUBLIC_CLIENTVAR: z.string(),
@@ -20,6 +21,7 @@ export const env = createEnv({
     SMTP_USER: process.env.SMTP_USER,
     SMTP_PASS: process.env.SMTP_PASS,
     SMTP_TO_ADDRESS: process.env.SMTP_TO_ADDRESS,
+    GITHUB_TOKEN: process.env.GITHUB_TOKEN,
   },
   skipValidation: !!process.env.SKIP_ENV_VALIDATION,
 });
