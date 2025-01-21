@@ -1,0 +1,47 @@
+[
+  {
+    "title": "Nyaaa-Bot",
+    "description": "(discontinued) A Discord bot written in C# I started to learn C# with.",
+    "repo": "Snupai/Nyaaa-Bot"
+  },
+  {
+    "title": "Personal Website",
+    "description": "My personal website built with Next.js, TypeScript, and Tailwind CSS (this one)",
+    "repo": "Snupai/snupai-site"
+  },
+  {
+    "title": "MultipackParser",
+    "description": "A tool for parsing and managing palettizing data for work internal Palettizing robots.",
+    "repo": "Snupai/MultipackParser"
+  },
+  {
+    "title": "C# Exercises",
+    "description": "A collection of exercises for learning C#.",
+    "repo": "Snupai/Uebungen-Csharp-Clos"
+  },
+  {
+    "title": "TCP/IP Communication",
+    "description": "A simple TCP/IP communication test for C#.",
+    "repo": "Snupai/tcp-ip-comm"
+  },
+  {
+    "title": "TicTacToe",
+    "description": "My final exam for school. A simple TicTacToe game for C#.",
+    "repo": "Snupai/TicTacToe"
+  },
+  {
+    "title": "TicTacToe TCP/IP",
+    "description": "The TCP/IP communication receiver for the TicTacToe game.",
+    "repo": "Snupai/TicTacToeTcpIpReceiver"
+  },
+  {
+    "title": "Discord Bot",
+    "description": "A simple Discord bot just for fun.",
+    "repo": "Snupai/some_bot"
+  },
+  {
+    "title": "MultiPack Visualizer",
+    "description": "A tool for visualizing palettizing data for work internal Palettizing robots.",
+    "repo": "Snupai/visualize_MultiPack"
+  }
+] 

@@ -1,0 +1,17 @@
+[
+  {
+    "title": "Nothing Glyph Tools",
+    "description": "A tool for creating custom nothing glyphs for Nothing Phones.",
+    "repo": "SebiAi/custom-nothing-glyph-tools"
+  },
+  {
+    "title": "Glyph Visualizer",
+    "description": "A tool for visualizing glyphs for Nothing Phones.",
+    "repo": "SebiAi/GlyphVisualizer"
+  },
+  {
+    "title": "Glyphify",
+    "description": "A tool for creating custom glyphs for Nothing Phones on Android.",
+    "repo": "Fr4nKB/Glyphify"
+  }
+] 
