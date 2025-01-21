@@ -1,5 +1,5 @@
 import Link from "next/link";
-import ClickableTitle from "~/components/ClickableTitle";
+import ClickableTitle from "@/components/ClickableTitle";
 import { type Metadata } from "next";
 
 export const metadata: Metadata = {
