@@ -99,13 +99,20 @@ export default function ClickableTitle({ text, url }: ClickableTitleProps) {
   }, [text]);
 
   const handleClick = async () => {
-    if (isSparkling) return; // Prevent multiple animations
+    if (isSparkling) return;
     
     try {
       await navigator.clipboard.writeText(url);
       setIsSparkling(true);
     } catch (err) {
       console.error('Failed to copy:', err);
+    }
+  };
+
+  const handleKeyDown = async (e: React.KeyboardEvent) => {
+    if (e.key === 'Enter' || e.key === ' ') {
+      e.preventDefault();
+      await handleClick();
     }
   };
 
@@ -117,11 +124,7 @@ export default function ClickableTitle({ text, url }: ClickableTitleProps) {
         className="title-highlight cursor-pointer select-none inline-block"
         role="button"
         tabIndex={0}
-        onKeyDown={(e) => {
-          if (e.key === 'Enter' || e.key === ' ') {
-            handleClick();
-          }
-        }}
+        onKeyDown={handleKeyDown}
         aria-label={`Copy ${url} to clipboard`}
       >
         {text}

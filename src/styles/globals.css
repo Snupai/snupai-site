@@ -42,14 +42,18 @@
   .title-highlight {
     @apply bg-clip-text text-transparent font-bold;
     background-size: 200% auto;
-    animation: shine 3s linear infinite, rotate 22s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+    animation: shine 3s linear infinite, rotate 24s cubic-bezier(0.4, 0, 0.6, 1) infinite;
     background-image: linear-gradient(
       45deg,
-      var(--pink) 0%,
+      var(--pink) -25%,
+      var(--lavender) 12.5%,
       var(--sapphire) 25%,
+      var(--sky) 37.5%,
       var(--mauve) 50%,
+      var(--blue) 62.5%,
       var(--sky) 75%,
-      var(--pink) 100%
+      var(--lavender) 87.5%,
+      var(--pink) 125%
     );
     transform-origin: center;
     will-change: transform;
