@@ -16,6 +16,10 @@ const octokit = new Octokit({
   userAgent: 'snupai-blog-v1.0',
 });
 
+// Add type for Octokit error
+type OctokitError = Error & {
+  status?: number;
+};
 
 async function processGitHubImages(content: string, owner: string, repo: string, branch = 'main'): Promise<string> {
   console.log('Processing GitHub images for:', { owner, repo, branch });
@@ -63,6 +67,44 @@ type MatterData = {
   date?: string;
 };
 
+async function findCoverImage(owner: string, repo: string, defaultBranch: string): Promise<string | undefined> {
+  const possiblePaths = ['', 'assets', 'assets/images', 'images'];
+  
+  for (const basePath of possiblePaths) {
+    try {
+      const { data: dirContent } = await octokit.repos.getContent({
+        owner,
+        repo,
+        path: basePath,
+      }).catch((error: OctokitError) => {
+        // Silently handle 404 errors by returning empty data
+        if (error.status === 404) {
+          return { data: [] };
+        }
+        throw error;
+      });
+
+      if (Array.isArray(dirContent)) {
+        const coverImage = dirContent.find(file => 
+          file.type === 'file' && 
+          /^(?:cover|Cover|COVER)\.(jpg|jpeg|png|gif|webp)$/i.test(file.name)
+        );
+
+        if (coverImage) {
+          return `https://raw.githubusercontent.com/${owner}/${repo}/${defaultBranch}/${basePath}${basePath ? '/' : ''}${coverImage.name}`;
+        }
+      }
+    } catch (error) {
+      // Only log critical errors, not 404s
+      if (!(error as OctokitError).status || (error as OctokitError).status !== 404) {
+        console.error('Critical error in findCoverImage:', error);
+      }
+      continue; // Continue checking other paths even if one fails
+    }
+  }
+  return undefined;
+}
+
 export async function getBlogPost(slug: string): Promise<BlogPost | null> {
   try {
     const predefinedPost = await getPost(slug);
@@ -105,72 +147,93 @@ export async function getBlogPost(slug: string): Promise<BlogPost | null> {
         throw new Error('Invalid repository format');
       }
 
-      const { data: repoInfo } = await octokit.repos.get({
-        owner,
-        repo,
-      });
-      const defaultBranch = repoInfo.default_branch;
+      // Wrap the GitHub API calls in a try-catch to handle errors silently
+      try {
+        const { data: repoInfo } = await octokit.repos.get({
+          owner,
+          repo,
+        }).catch((error: OctokitError) => {
+          if (error.status === 404) {
+            return { data: { default_branch: 'main' } };
+          }
+          throw error;
+        });
 
-      const { data: readme } = await octokit.repos.getReadme({
-        owner,
-        repo,
-        mediaType: { format: 'raw' },
-      });
+        const defaultBranch = repoInfo.default_branch;
+        const coverImage = await findCoverImage(owner, repo, defaultBranch);
 
-      // Process images in the README
-      const processedContent = await processGitHubImages(
-        typeof readme === 'string' ? readme : readme.content,
-        owner,
-        repo,
-        defaultBranch
-      );
+        const { data: readme } = await octokit.repos.getReadme({
+          owner,
+          repo,
+          mediaType: { format: 'raw' },
+        }).catch(() => ({ data: '' }));
 
-      const content = await unified()
-        .use(remarkParse)
-        .use(remarkGfm)
-        .use(remarkHtml, { 
-          sanitize: false,
-          allowDangerousHtml: true 
-        })
-        .process(processedContent);
+        const processedContent = await processGitHubImages(
+          typeof readme === 'string' ? readme : readme.content ?? '',
+          owner,
+          repo,
+          defaultBranch
+        );
 
-      // Try to find a cover image from the first image in the README
-      let coverImage: string | undefined;
-      const imageRegex = /!\[([^\]]*)\]\((https:\/\/raw\.githubusercontent\.com[^)]+)\)/;
-      const firstImageMatch = imageRegex.exec(processedContent);
-      if (firstImageMatch) {
-        coverImage = firstImageMatch[2];
-      }
+        const content = await unified()
+          .use(remarkParse)
+          .use(remarkGfm)
+          .use(remarkHtml, { 
+            sanitize: false,
+            allowDangerousHtml: true 
+          })
+          .process(processedContent);
 
-      // If no cover image found in README, try to get the first image from assets/images
-      if (!coverImage) {
-        try {
-          const { data: imageDir } = await octokit.repos.getContent({
-            owner,
-            repo,
-            path: 'assets/images',
-          });
+        // If no dedicated cover image found, fall back to first image in README
+        let finalCoverImage = coverImage;
+        if (!finalCoverImage) {
+          const imageRegex = /!\[([^\]]*)\]\((https:\/\/raw\.githubusercontent\.com[^)]+)\)/;
+          const firstImageMatch = imageRegex.exec(processedContent);
+          if (firstImageMatch) {
+            finalCoverImage = firstImageMatch[2];
+          }
 
-          if (Array.isArray(imageDir)) {
-            const firstImage = imageDir.find(file => 
-              file.type === 'file' && 
-              /\.(jpg|jpeg|png|gif)$/i.test(file.name)
-            );
+          // If still no image, try the assets/images directory as before
+          if (!finalCoverImage) {
+            try {
+              const { data: imageDir } = await octokit.repos.getContent({
+                owner,
+                repo,
+                path: 'assets/images',
+              });
 
-            if (firstImage) {
-              coverImage = `https://raw.githubusercontent.com/${owner}/${repo}/${defaultBranch}/assets/images/${firstImage.name}`;
+              if (Array.isArray(imageDir)) {
+                const firstImage = imageDir.find(file => 
+                  file.type === 'file' && 
+                  /\.(jpg|jpeg|png|gif|webp)$/i.test(file.name)
+                );
+
+                if (firstImage) {
+                  finalCoverImage = `https://raw.githubusercontent.com/${owner}/${repo}/${defaultBranch}/assets/images/${firstImage.name}`;
+                }
+              }
+            } catch (error) {
+              console.warn('Could not fetch images directory:', error);
             }
           }
-        } catch (error) {
-          console.warn('Could not fetch images directory:', error);
         }
-      }
 
-      return {
-        ...predefinedPost,
-        content: content.toString(),
-        coverImage,
-      };
+        return {
+          ...predefinedPost,
+          content: content.toString(),
+          coverImage: finalCoverImage,
+        };
+      } catch (error) {
+        // Only log non-404 errors
+        if (!(error as OctokitError).status || (error as OctokitError).status !== 404) {
+          console.error('Error fetching GitHub content:', error);
+        }
+        return {
+          ...predefinedPost,
+          content: '',
+          coverImage: undefined,
+        };
+      }
     }
   } catch (error) {
     console.error(`Error getting blog post ${slug}:`, error);
