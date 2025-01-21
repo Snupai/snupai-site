@@ -42,7 +42,7 @@
   .title-highlight {
     @apply bg-clip-text text-transparent font-bold;
     background-size: 200% auto;
-    animation: shine 3s linear infinite, rotate 8s ease-in-out infinite;
+    animation: shine 3s linear infinite, rotate 22s cubic-bezier(0.4, 0, 0.6, 1) infinite;
     background-image: linear-gradient(
       45deg,
       var(--pink) 0%,
@@ -51,6 +51,8 @@
       var(--sky) 75%,
       var(--pink) 100%
     );
+    transform-origin: center;
+    will-change: transform;
     text-shadow: 0 0 20px rgba(245, 194, 231, 0.3);
   }
 }
@@ -79,6 +81,37 @@
   }
   100% {
     background-image: linear-gradient(405deg, var(--pink) 0%, var(--sapphire) 25%, var(--mauve) 50%, var(--sky) 75%, var(--pink) 100%);
+  }
+}
+
+@keyframes sparkle-twinkle {
+  0% {
+    transform: translate(-50%, -50%) scale(0) rotate(0deg);
+    opacity: 0;
+  }
+  20% {
+    transform: translate(-50%, -50%) scale(1.4) rotate(90deg);
+    opacity: 1;
+  }
+  35% {
+    transform: translate(-50%, -50%) scale(0.9) rotate(135deg);
+    opacity: 0.7;
+  }
+  50% {
+    transform: translate(-50%, -50%) scale(1.2) rotate(180deg);
+    opacity: 0.9;
+  }
+  65% {
+    transform: translate(-50%, -50%) scale(0.8) rotate(225deg);
+    opacity: 0.6;
+  }
+  80% {
+    transform: translate(-50%, -50%) scale(1.3) rotate(270deg);
+    opacity: 0.8;
+  }
+  100% {
+    transform: translate(-50%, -50%) scale(0) rotate(360deg);
+    opacity: 0;
   }
 }
 
