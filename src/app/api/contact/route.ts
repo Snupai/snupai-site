@@ -1,7 +1,7 @@
 import { type NextRequest } from "next/server";
 import nodemailer from "nodemailer";
 import { z } from "zod";
-import { env } from "../../../env.js";
+import { env } from "@/env.js";
 
 const contactFormSchema = z.object({
   name: z.string().min(2, "Name must be at least 2 characters"),
