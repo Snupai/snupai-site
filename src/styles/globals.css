@@ -88,6 +88,10 @@
     color: var(--text);
   }
   
+  /* Text colors */
+  .text-mocha-text { color: var(--text); }
+  .text-mocha-subtext0 { color: var(--subtext0); }
+  .text-mocha-subtext1 { color: var(--subtext1); }
   .text-mocha-rosewater { color: var(--rosewater); }
   .text-mocha-flamingo { color: var(--flamingo); }
   .text-mocha-pink { color: var(--pink); }
@@ -103,6 +107,8 @@
   .text-mocha-blue { color: var(--blue); }
   .text-mocha-lavender { color: var(--lavender); }
   
+  /* Background colors */
+  .bg-mocha-mantle { background-color: var(--mantle); }
   .bg-mocha-surface { background-color: var(--surface0); }
   .bg-mocha-surface-1 { background-color: var(--surface1); }
   .bg-mocha-surface-2 { background-color: var(--surface2); }
@@ -110,8 +116,89 @@
   .bg-mocha-overlay-1 { background-color: var(--overlay1); }
   .bg-mocha-overlay-2 { background-color: var(--overlay2); }
   
+  /* Borders and hovers */
   .border-mocha { border-color: var(--overlay0); }
+  .border-mocha-surface { border-color: var(--surface0); }
+  .border-mocha-surface-1 { border-color: var(--surface1); }
+  .border-mocha-surface-2 { border-color: var(--surface2); }
   .hover\:bg-mocha-surface:hover { background-color: var(--surface0); }
   .hover\:text-mocha-lavender:hover { color: var(--lavender); }
+}
+
+.markdown-content {
+  @apply text-mocha-text;
+}
+
+.markdown-content h1,
+.markdown-content h2,
+.markdown-content h3,
+.markdown-content h4 {
+  @apply text-mocha-text font-bold mt-8 mb-4;
+}
+
+.markdown-content img {
+  @apply max-w-full h-auto rounded-lg my-4;
+}
+
+.markdown-content pre {
+  @apply p-4 rounded-lg overflow-x-auto bg-mocha-mantle my-4;
+}
+
+.markdown-content code {
+  @apply bg-mocha-mantle px-1.5 py-0.5 rounded text-mocha-mauve;
+}
+
+.markdown-content blockquote {
+  @apply border-l-4 border-mocha-surface pl-4 italic my-4 text-mocha-subtext0;
+}
+
+.markdown-content table {
+  @apply border-collapse w-full my-4;
+}
+
+.markdown-content th,
+.markdown-content td {
+  @apply border border-mocha-surface px-4 py-2;
+}
+
+.markdown-content ul,
+.markdown-content ol {
+  @apply my-4 ml-6;
+}
+
+.markdown-content ul {
+  @apply list-disc;
+}
+
+.markdown-content ol {
+  @apply list-decimal;
+}
+
+.markdown-content a {
+  @apply text-mocha-blue hover:text-mocha-sapphire transition-colors;
+}
+
+.markdown-content p {
+  @apply my-4;
+}
+
+.markdown-content div[align="center"] {
+  @apply text-center my-8;
+}
+
+.markdown-content div[align="center"] img {
+  @apply mx-auto max-w-[600px] w-full h-auto rounded-lg;
+}
+
+.markdown-content div[align="center"] br {
+  @apply block my-2;
+}
+
+.markdown-content div[align="center"] a {
+  @apply inline-block;
+}
+
+.markdown-content img {
+  @apply rounded-lg;
 }
 
