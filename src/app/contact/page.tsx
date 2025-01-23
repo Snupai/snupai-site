@@ -11,12 +11,21 @@ export const metadata: Metadata = {
     siteName: "Snupai's Website",
     locale: "en_US",
     type: "website",
+    images: [
+      {
+        url: '/api/og?path=/contact',
+        width: 1200,
+        height: 630,
+        alt: 'Contact Snupai',
+      },
+    ],
   },
   twitter: {
     card: "summary_large_image",
     title: "Contact Snupai",
     description: "Get in touch with me through various social platforms.",
     creator: "@Snupai",
+    images: ['/api/og?path=/contact'],
   },
 };
 

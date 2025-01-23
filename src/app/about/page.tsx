@@ -10,12 +10,21 @@ export const metadata: Metadata = {
     siteName: "Snupai's Website",
     locale: "en_US",
     type: "website",
+    images: [
+      {
+        url: '/api/og?path=/about',
+        width: 1200,
+        height: 630,
+        alt: 'About Snupai',
+      },
+    ],
   },
   twitter: {
     card: "summary_large_image",
     title: "About Snupai",
     description: "Learn more about me - a student, programmer, and automation engineer.",
     creator: "@Snupai",
+    images: ['/api/og?path=/about'],
   },
 };
 

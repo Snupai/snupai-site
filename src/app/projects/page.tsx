@@ -85,12 +85,21 @@ export const metadata: Metadata = {
     siteName: "Snupai's Website",
     locale: "en_US",
     type: "website",
+    images: [
+      {
+        url: '/api/og?path=/projects',
+        width: 1200,
+        height: 630,
+        alt: 'Snupai Projects',
+      },
+    ],
   },
   twitter: {
     card: "summary_large_image",
     title: "Snupai's Projects",
     description: "Check out my projects and other cool projects I recommend.",
     creator: "@Snupai",
+    images: ['/api/og?path=/projects'],
   },
 };
 

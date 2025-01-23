@@ -29,13 +29,21 @@ export async function generateMetadata(
       siteName: "Snupai's Website",
       locale: "en_US",
       type: "article",
-      images: post.coverImage ? [{ url: post.coverImage }] : [],
+      images: [
+        {
+          url: `/api/og?path=/blog/${post.slug}`,
+          width: 1200,
+          height: 630,
+          alt: post.title,
+        },
+      ],
     },
     twitter: {
       card: "summary_large_image",
       title: post.title,
       description: post.description,
       creator: "@Snupai",
+      images: [`/api/og?path=/blog/${post.slug}`],
     },
   };
 }
