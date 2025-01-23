@@ -6,16 +6,6 @@ import { TRPCReactProvider } from "@/trpc/react";
 import Footer from "@/components/Footer";
 import Navigation from "@/components/Navigation";
 
-export const metadata: Metadata = {
-  metadataBase: new URL("https://snupai.me"),
-  title: {
-    default: "Snupai's Website",
-    template: "%s | Snupai's Website",
-  },
-  description: "Personal website of Snupai - Student, Programmer, and Automation Engineer",
-  icons: [{ rel: "icon", url: "/snupai.ico" }],
-};
-
 export default function RootLayout({
   children,
 }: Readonly<{ children: React.ReactNode }>) {
