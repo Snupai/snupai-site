@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
+import { useAutoAnimate } from '@formkit/auto-animate/react';
 import { Select, SelectContent, SelectGroup, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 
 type Repo = {
@@ -24,6 +25,8 @@ export default function ProjectList({ initialRepos }: { initialRepos: Repo[] }) 
   useEffect(() => {
     setMounted(true);
   }, []);
+
+  const [listRef] = useAutoAnimate();
 
   const sortedRepos = [...initialRepos].sort((a, b) => {
     if (sortBy === 'stars') {
@@ -105,7 +108,7 @@ export default function ProjectList({ initialRepos }: { initialRepos: Repo[] }) 
         </div>
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+      <div ref={listRef} className="grid grid-cols-1 md:grid-cols-2 gap-6">
         {sortedRepos.map(repo => (
           <div key={repo.id} className="rounded-xl bg-mocha-surface p-6 space-y-4 min-w-[320px]">
             <div className="flex justify-between items-start gap-4">
