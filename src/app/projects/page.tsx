@@ -36,11 +36,19 @@ const REPO_LIST = [
   },
   {
     path: 'Snupai/some_bot',
-    description: 'A simple Discord bot just for fun.'
+    description: 'A Discord bot just for fun.'
   },
   {
     path: 'Snupai/visualize_MultiPack',
     description: 'A tool for visualizing palettizing data for work internal Palettizing robots.'
+  },
+  {
+    path: 'Snupai/heymiizu-fm-site',
+    description: 'A website for a friend of mine using framer motion.'
+  },
+  {
+    path: 'Snupai/carrd-miizu-site',
+    description: 'A carrd.co clone for a friend of mine using a lot of css animations.'
   }
 ];
 
@@ -52,6 +60,14 @@ const SHOUTOUT_REPO_LIST = [
   {
     path: 'SebiAi/GlyphVisualizer',
     description: 'A tool for visualizing glyphs for Nothing Phones.'
+  },
+  {
+    path: 'Pycord-Development/pycord',
+    description: 'Pycord is a modern, easy to use, feature-rich, and async ready API wrapper for Discord written in Python.'
+  },
+  {
+    path: 'Aiko-IT-Systems/DisCatSharp',
+    description: 'Your library to write discord apps in C# with focus on always providing access to the latest discord features.'
   }
 ];
 

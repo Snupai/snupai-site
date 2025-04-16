@@ -34,7 +34,7 @@ export default function ProjectList({ initialRepos }: { initialRepos: Repo[] }) 
   function formatDate(dateString: string) {
     const date = new Date(dateString);
     return mounted 
-      ? date.toLocaleDateString() 
+      ? date.toISOString().split('T')[0]
       : date.toISOString().split('T')[0];
   }
 
