@@ -32,6 +32,21 @@
     --mantle: #181825;
     --crust: #11111b;
   }
+
+  html, body, #__next {
+    min-height: 100vh;
+    background: #1e1e2e;
+    background-color: #1e1e2e;
+  }
+
+  body {
+    color: var(--text);
+    font-family: inherit;
+    min-height: 100vh;
+    background: #1e1e2e;
+    background-color: #1e1e2e;
+    overflow-x: hidden;
+  }
 }
 
 @layer components {
@@ -114,4 +129,3 @@
   .hover\:bg-mocha-surface:hover { background-color: var(--surface0); }
   .hover\:text-mocha-lavender:hover { color: var(--lavender); }
 }
-

@@ -1,0 +1,38 @@
+.imprintMain {
+  padding-top: 7rem;
+  padding-bottom: 3rem;
+  max-width: 48rem;
+  margin-left: auto;
+  margin-right: auto;
+  padding-left: 1rem;
+  padding-right: 1rem;
+  color: var(--text); /* Use light text color from theme */
+}
+.imprintH1 {
+  font-size: 2rem;
+  font-weight: 800;
+  margin-bottom: 2rem;
+  color: var(--rosewater); /* Use accent color for heading */
+}
+.imprintH2 {
+  font-size: 1.2rem;
+  font-weight: 700;
+  margin-top: 2.5rem;
+  margin-bottom: 1.2rem;
+  color: var(--rosewater); /* Use accent color for subheading */
+}
+.imprintAddress {
+  font-style: normal;
+  line-height: 1.6;
+  margin-bottom: 0.5rem;
+  color: var(--text); /* Ensure address is readable */
+}
+.imprintSection {
+  margin-bottom: 2.5rem;
+  color: var(--text); /* Ensure section text is readable */
+}
+.imprintItalic {
+  font-style: italic;
+  margin-bottom: 1rem;
+  color: var(--subtext1); /* Subtle color for italics */
+}
