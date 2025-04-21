@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
+import { LanguageSkillRater } from "./LanguageSkillRater";
 
 type Repo = {
   id: number;
@@ -86,9 +87,10 @@ export default function ProjectList({ initialRepos }: { initialRepos: Repo[] }) 
             
             <div className="flex flex-wrap gap-3">
               {repo.language && (
-                <span className="px-3 py-1 rounded-full bg-mocha-surface-1 text-sm">
+                <span className="px-3 py-1 rounded-full bg-mocha-surface-1 text-sm flex items-center gap-2">
                   <span className="w-2 h-2 inline-block rounded-full bg-[#3572A5] mr-2"></span>
                   {repo.language}
+                  <LanguageSkillRater language={repo.language} />
                 </span>
               )}
               <span className="px-3 py-1 rounded-full bg-mocha-surface-1 text-sm text-mocha-subtext0">
