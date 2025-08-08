@@ -1,7 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
-import { LanguageSkillRater } from "./LanguageSkillRater";
+import { useState, useEffect, useLayoutEffect, useRef } from 'react';
 
 type Repo = {
   id: number;
@@ -11,6 +10,8 @@ type Repo = {
   stargazers_count: number;
   last_commit: string;
   html_url: string;
+  homepage?: string;
+  archived?: boolean;
   owner: {
     login: string;
     html_url: string;
@@ -20,10 +21,43 @@ type Repo = {
 export default function ProjectList({ initialRepos }: { initialRepos: Repo[] }) {
   const [sortBy, setSortBy] = useState('lastCommit');
   const [mounted, setMounted] = useState(false);
+  const [roasts, setRoasts] = useState<Record<number, string>>({});
+  const itemRefs = useRef<Map<number, HTMLElement>>(new Map());
+  const prevRectsRef = useRef<Map<number, DOMRect> | null>(null);
+  const reduceMotion = typeof window !== 'undefined' && window.matchMedia ? window.matchMedia('(prefers-reduced-motion: reduce)').matches : false;
   
   useEffect(() => {
     setMounted(true);
   }, []);
+
+  // Animate reordering using FLIP technique
+  useLayoutEffect(() => {
+    if (reduceMotion) return;
+    const currentRects = new Map<number, DOMRect>();
+    itemRefs.current.forEach((el, id) => {
+      currentRects.set(id, el.getBoundingClientRect());
+    });
+    const prevRects = prevRectsRef.current;
+    if (prevRects) {
+      currentRects.forEach((newRect, id) => {
+        const prevRect = prevRects.get(id);
+        if (!prevRect) return;
+        const dx = prevRect.left - newRect.left;
+        const dy = prevRect.top - newRect.top;
+        if (dx !== 0 || dy !== 0) {
+          const el = itemRefs.current.get(id);
+          if (!el) return;
+          el.style.transition = 'transform 0s';
+          el.style.transform = `translate(${dx}px, ${dy}px)`;
+          requestAnimationFrame(() => {
+            el.style.transition = 'transform 400ms cubic-bezier(0.2, 0.8, 0.2, 1)';
+            el.style.transform = '';
+          });
+        }
+      });
+    }
+    prevRectsRef.current = currentRects;
+  });
 
   const sortedRepos = [...initialRepos].sort((a, b) => {
     if (sortBy === 'stars') {
@@ -37,6 +71,24 @@ export default function ProjectList({ initialRepos }: { initialRepos: Repo[] }) 
     return mounted 
       ? date.toISOString().split('T')[0]
       : date.toISOString().split('T')[0];
+  }
+
+  async function fetchRoast(repo: Repo): Promise<string> {
+    const existing = roasts[repo.id];
+    if (typeof existing === 'string' && existing.length > 0) return existing;
+    try {
+      const params = new URLSearchParams({ name: repo.name });
+      const res = await fetch(`/api/ai-roast?${params.toString()}`);
+      const data = (await res.json()) as { roast?: string };
+      const text = (data.roast ?? '').trim();
+      if (text) {
+        setRoasts(prev => ({ ...prev, [repo.id]: text }));
+        return text;
+      }
+    } catch {
+      /* noop */
+    }
+    return '';
   }
 
   return (
@@ -61,7 +113,14 @@ export default function ProjectList({ initialRepos }: { initialRepos: Repo[] }) 
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
         {sortedRepos.map(repo => (
-          <div key={repo.id} className="rounded-xl bg-mocha-surface p-6 space-y-4 min-w-[320px]">
+          <div
+            key={repo.id}
+            ref={(el) => {
+              if (el) itemRefs.current.set(repo.id, el);
+              else itemRefs.current.delete(repo.id);
+            }}
+            className="rounded-xl bg-mocha-surface p-6 space-y-4 min-w-[320px] will-change-transform"
+          >
             <div className="flex justify-between items-start gap-4">
               <div className="space-y-1 min-w-0">
                 <h3 className="text-2xl font-bold text-mocha-flamingo truncate">{repo.name}</h3>
@@ -86,11 +145,15 @@ export default function ProjectList({ initialRepos }: { initialRepos: Repo[] }) 
             <p className="text-mocha-text">{repo.description}</p>
             
             <div className="flex flex-wrap gap-3">
+              {repo.archived && (
+                <span className="inline-flex items-center px-3 py-1 rounded-full text-sm bg-[var(--maroon)] text-[var(--crust)]">
+                  Archived
+                </span>
+              )}
               {repo.language && (
                 <span className="px-3 py-1 rounded-full bg-mocha-surface-1 text-sm flex items-center gap-2">
                   <span className="w-2 h-2 inline-block rounded-full bg-[#3572A5] mr-2"></span>
                   {repo.language}
-                  <LanguageSkillRater language={repo.language} />
                 </span>
               )}
               <span className="px-3 py-1 rounded-full bg-mocha-surface-1 text-sm text-mocha-subtext0">
@@ -98,14 +161,41 @@ export default function ProjectList({ initialRepos }: { initialRepos: Repo[] }) 
               </span>
             </div>
 
-            <a 
-              href={repo.html_url}
-              target="_blank"
-              rel="noopener noreferrer" 
-              className="inline-block mt-2 text-mocha-blue hover:underline"
-            >
-              View on GitHub →
-            </a>
+            <div className="mt-2 flex flex-wrap gap-4">
+              <a 
+                href={repo.html_url}
+                target="_blank"
+                rel="noopener noreferrer" 
+                className="text-mocha-blue hover:underline"
+              >
+                View on GitHub →
+              </a>
+              {repo.homepage && /^https?:\/\//i.test(repo.homepage) && (
+                <a 
+                  href={repo.homepage}
+                  target="_blank"
+                  rel="noopener noreferrer" 
+                  className="text-mocha-green hover:underline"
+                >
+                  Visit website →
+                </a>
+              )}
+            </div>
+            <div className="mt-2">
+              <button
+                className="text-xs px-2 py-1 bg-mocha-surface-1 rounded-full border border-mocha text-mocha-subtext0 hover:text-mocha-lavender"
+                onMouseEnter={() => { void fetchRoast(repo); }}
+                onFocus={() => { void fetchRoast(repo); }}
+                title={roasts[repo.id] ?? 'AI Roast'}
+              >
+                🤖 AI Roast
+              </button>
+              {roasts[repo.id] && (
+                <div className="mt-2 text-sm text-mocha-subtext0 bg-mocha-surface-1 border border-mocha rounded-lg p-2">
+                  {roasts[repo.id]}
+                </div>
+              )}
+            </div>
           </div>
         ))}
       </div>

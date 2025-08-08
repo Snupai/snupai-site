@@ -10,6 +10,7 @@ export const env = createEnv({
     SMTP_PASS: z.string(),
     SMTP_TO_ADDRESS: z.string(),
     GOOGLE_GENERATIVE_AI_API_KEY: z.string(),
+    GITHUB_TOKEN: z.string().optional(),
   },
   client: {
     // NEXT_PUBLIC_CLIENTVAR: z.string(),
@@ -22,6 +23,7 @@ export const env = createEnv({
     SMTP_PASS: process.env.SMTP_PASS,
     SMTP_TO_ADDRESS: process.env.SMTP_TO_ADDRESS,
     GOOGLE_GENERATIVE_AI_API_KEY: process.env.GOOGLE_GENERATIVE_AI_API_KEY,
+    GITHUB_TOKEN: process.env.GITHUB_TOKEN,
   },
   skipValidation: !!process.env.SKIP_ENV_VALIDATION,
 });

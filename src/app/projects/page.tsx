@@ -1,5 +1,6 @@
 import ProjectList from "~/components/ProjectList";
 import { type Metadata } from "next";
+import { env } from "~/env";
 
 const REPO_LIST = [
   {
@@ -77,9 +78,13 @@ type GitHubRepo = {
   description: string | null;
   default_branch: string;
   html_url: string;
+  homepage?: string | null;
   language: string;
   stargazers_count: number;
   private: boolean;
+  archived: boolean;
+  pushed_at?: string;
+  updated_at?: string;
   owner: {
     login: string;
     html_url: string;
@@ -99,6 +104,7 @@ async function getReposData(repoList: typeof REPO_LIST) {
     try {
       // Get repo info
       const repoRes = await fetch(`https://api.github.com/repos/${path}`, {
+        headers: env.GITHUB_TOKEN ? { Authorization: `Bearer ${env.GITHUB_TOKEN}` } : undefined,
         next: { revalidate: 3600 }
       });
 
@@ -118,20 +124,29 @@ async function getReposData(repoList: typeof REPO_LIST) {
 
       // Get latest commit to default branch
       const commitRes = await fetch(`https://api.github.com/repos/${path}/commits/${repoData.default_branch}`, {
+        headers: env.GITHUB_TOKEN ? { Authorization: `Bearer ${env.GITHUB_TOKEN}` } : undefined,
         next: { revalidate: 3600 }
       });
 
-      if (!commitRes.ok) {
+      let lastCommitDate: string | null = null;
+      if (commitRes.ok) {
+        const commitData = (await commitRes.json()) as GitHubCommit;
+        lastCommitDate = commitData.commit.committer.date;
+      } else {
         console.warn(`Could not fetch commits for ${path}: ${commitRes.statusText}`);
+        // Fallback to pushed_at or updated_at if available
+        lastCommitDate = repoData.pushed_at ?? repoData.updated_at ?? null;
+      }
+
+      if (!lastCommitDate) {
         return null;
       }
 
-      const commitData = (await commitRes.json()) as GitHubCommit;
-
       return {
         ...repoData,
-        description: description ?? repoData.description ?? '', // Provide fallback for null description
-        last_commit: commitData.commit.committer.date
+        homepage: repoData.homepage && repoData.homepage.trim().length > 0 ? repoData.homepage : undefined,
+        description: description ?? repoData.description ?? '',
+        last_commit: lastCommitDate,
       };
     } catch (error) {
       console.error(`Error fetching data for ${path}:`, error);
