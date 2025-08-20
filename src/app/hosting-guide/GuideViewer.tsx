@@ -1,19 +1,47 @@
 "use client";
 
-import { useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
+import { useRouter, useSearchParams } from 'next/navigation';
 
 export default function GuideViewer({
   deGreeting,
   enGreeting,
   deHtml,
   enHtml,
+  initialLang,
 }: {
   deGreeting: string;
   enGreeting: string;
   deHtml: string;
   enHtml: string;
+  initialLang: 'de' | 'en';
 }) {
-  const [lang, setLang] = useState<'de' | 'en'>('de');
+  const router = useRouter();
+  const searchParams = useSearchParams();
+
+  const [lang, setLang] = useState<'de' | 'en'>(initialLang);
+
+  // Ensure local state reflects prop if it changes (should be stable per render)
+  useEffect(() => {
+    setLang(initialLang);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [initialLang]);
+
+  const updateUrl = useCallback(
+    (newLang: 'de' | 'en') => {
+      const params = new URLSearchParams(searchParams?.toString() ?? '');
+      params.set('lang', newLang);
+      const qs = params.toString();
+      const hash = typeof window !== 'undefined' ? window.location.hash : '';
+      router.replace(`?${qs}${hash}`);
+    },
+    [router, searchParams]
+  );
+
+  const handleSetLang = (newLang: 'de' | 'en') => {
+    setLang(newLang);
+    updateUrl(newLang);
+  };
   const heading = lang === 'de' ? deGreeting : enGreeting;
 
   return (
@@ -23,7 +51,7 @@ export default function GuideViewer({
         <div className="inline-flex rounded border border-gray-300 p-0.5">
           <button
             type="button"
-            onClick={() => setLang('de')}
+            onClick={() => handleSetLang('de')}
             className={`px-3 py-1 text-sm ${
               lang === 'de' ? 'bg-gray-900 text-white' : 'text-gray-700 hover:bg-gray-100'
             } rounded`}
@@ -33,7 +61,7 @@ export default function GuideViewer({
           </button>
           <button
             type="button"
-            onClick={() => setLang('en')}
+            onClick={() => handleSetLang('en')}
             className={`px-3 py-1 text-sm ${
               lang === 'en' ? 'bg-gray-900 text-white' : 'text-gray-700 hover:bg-gray-100'
             } rounded`}

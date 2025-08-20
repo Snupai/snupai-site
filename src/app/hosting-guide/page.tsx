@@ -55,6 +55,16 @@ export default async function Page({
       ? (rawNameParam[0] ?? '').trim()
       : '';
 
+  // Optional language selection via ?lang=en or ?lang=de (default: 'de')
+  const rawLangParam = params?.lang;
+  const langParam =
+    typeof rawLangParam === 'string'
+      ? rawLangParam.trim().toLowerCase()
+      : Array.isArray(rawLangParam)
+      ? (rawLangParam[0] ?? '').trim().toLowerCase()
+      : '';
+  const initialLang: 'de' | 'en' = langParam === 'en' ? 'en' : 'de';
+
   // Read from .md files only (German: prefer .de.md, fallback to default .md)
   const [deFromFile, enFromFile] = await Promise.all([
     fetchMarkdown('/hosting-guide/nextjs-hostin-guide.de.md'),
@@ -89,7 +99,13 @@ export default async function Page({
 
   return (
     <div className="mx-auto max-w-3xl px-4 py-24">
-      <GuideViewer deGreeting={deGreeting} enGreeting={enGreeting} deHtml={deHtml} enHtml={enHtml} />
+      <GuideViewer
+        deGreeting={deGreeting}
+        enGreeting={enGreeting}
+        deHtml={deHtml}
+        enHtml={enHtml}
+        initialLang={initialLang}
+      />
     </div>
   );
 }
