@@ -1,17 +1,27 @@
 import GuideViewer from './GuideViewer';
-import fs from 'fs';
-import path from 'path';
 import { unified } from 'unified';
 import remarkParse from 'remark-parse';
 import remarkGfm from 'remark-gfm';
 import remarkRehype from 'remark-rehype';
 import rehypeStringify from 'rehype-stringify';
+import { headers } from 'next/headers';
 
-async function readMarkdown(fileName: string) {
+export const dynamic = 'force-dynamic';
+
+async function getBaseUrl() {
+  const h = await headers();
+  const proto = h.get('x-forwarded-proto') ?? 'https';
+  const host = h.get('x-forwarded-host') ?? h.get('host') ?? 'localhost:3000';
+  return `${proto}://${host}`;
+}
+
+async function fetchMarkdown(publicPath: string) {
   try {
-    const fullPath = path.join(process.cwd(), fileName);
-    const content = await fs.promises.readFile(fullPath, 'utf8');
-    return content;
+    const base = await getBaseUrl();
+    const url = new URL(publicPath, base);
+    const res = await fetch(url, { cache: 'force-cache' });
+    if (!res.ok) return null;
+    return await res.text();
   } catch {
     return null;
   }
@@ -31,14 +41,24 @@ async function mdToHtml(md: string) {
   }
 }
 
-export default async function Page({ searchParams }: { searchParams: Promise<{ name?: string }> }) {
-  const { name: nameParam = '' } = await searchParams;
-  const name = nameParam.trim();
+export default async function Page({
+  searchParams,
+}: {
+  searchParams: Promise<Record<string, string | string[] | undefined>>;
+}) {
+  const params = await searchParams;
+  const rawNameParam = params?.name;
+  const name =
+    typeof rawNameParam === 'string'
+      ? rawNameParam.trim()
+      : Array.isArray(rawNameParam)
+      ? (rawNameParam[0] ?? '').trim()
+      : '';
 
   // Read from .md files only (German: prefer .de.md, fallback to default .md)
   const [deFromFile, enFromFile] = await Promise.all([
-    readMarkdown('nextjs-hostin-guide.de.md'),
-    readMarkdown('nextjs-hostin-guide.en.md'),
+    fetchMarkdown('/hosting-guide/nextjs-hostin-guide.de.md'),
+    fetchMarkdown('/hosting-guide/nextjs-hostin-guide.en.md'),
   ]);
 
   const deRaw = (deFromFile ?? '').trim();
