@@ -87,8 +87,10 @@ export async function GET(req: NextRequest) {
     roastCache[key] = { detail: text, expiresAt: now + 24 * 60 * 60 * 1000 };
     return new Response(JSON.stringify({ roast: text }), { status: 200, headers: buildCacheHeaders(60 * 60 * 24) });
   } catch (err) {
+    // Log error details for debugging, but do not expose them to the client
+    console.error('AI error:', err);
     return new Response(
-      JSON.stringify({ error: 'AI error', detail: String(err) }),
+      JSON.stringify({ error: 'AI error' }),
       { status: 500, headers: { 'Content-Type': 'application/json' } }
     );
   }
