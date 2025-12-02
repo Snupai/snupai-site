@@ -25,11 +25,17 @@ function getClientIp(req: NextRequest): string {
 
 function isAllowedReferer(req: NextRequest): boolean {
   const referer = req.headers.get('referer') ?? '';
-  return (
-    referer.startsWith('http://localhost') ||
-    referer.startsWith('https://localhost') ||
-    referer.startsWith('https://snupai.me')
-  );
+  try {
+    const url = new URL(referer);
+    const allowedHostnames = [
+      'localhost',
+      'snupai.me',
+    ];
+    return allowedHostnames.includes(url.hostname);
+  } catch {
+    // If referer is not a valid URL, reject
+    return false;
+  }
 }
 
 function buildCacheHeaders(ttlSeconds: number): HeadersInit {
