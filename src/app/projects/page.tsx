@@ -8,10 +8,6 @@ const REPO_LIST = [
     description: '(discontinued) A Discord bot written in C# I started to learn C# with.'
   },
   {
-    path: 'Snupai/snupai-site',
-    description: 'My personal website built with Next.js, TypeScript, and Tailwind CSS (this one)'
-  },
-  {
     path: 'Snupai/MultipackParser',
     description: 'A tool for parsing and managing palettizing data for work internal Palettizing robots.'
   },

@@ -21,7 +21,6 @@ type Repo = {
 export default function ProjectList({ initialRepos }: { initialRepos: Repo[] }) {
   const [sortBy, setSortBy] = useState('lastCommit');
   const [mounted, setMounted] = useState(false);
-  const [roasts, setRoasts] = useState<Record<number, string>>({});
   const itemRefs = useRef<Map<number, HTMLElement>>(new Map());
   const prevRectsRef = useRef<Map<number, DOMRect> | null>(null);
   const reduceMotion = typeof window !== 'undefined' && window.matchMedia ? window.matchMedia('(prefers-reduced-motion: reduce)').matches : false;
@@ -71,24 +70,6 @@ export default function ProjectList({ initialRepos }: { initialRepos: Repo[] }) 
     return mounted 
       ? date.toISOString().split('T')[0]
       : date.toISOString().split('T')[0];
-  }
-
-  async function fetchRoast(repo: Repo): Promise<string> {
-    const existing = roasts[repo.id];
-    if (typeof existing === 'string' && existing.length > 0) return existing;
-    try {
-      const params = new URLSearchParams({ name: repo.name });
-      const res = await fetch(`/api/ai-roast?${params.toString()}`);
-      const data = (await res.json()) as { roast?: string };
-      const text = (data.roast ?? '').trim();
-      if (text) {
-        setRoasts(prev => ({ ...prev, [repo.id]: text }));
-        return text;
-      }
-    } catch {
-      /* noop */
-    }
-    return '';
   }
 
   return (
@@ -179,21 +160,6 @@ export default function ProjectList({ initialRepos }: { initialRepos: Repo[] }) 
                 >
                   Visit website →
                 </a>
-              )}
-            </div>
-            <div className="mt-2">
-              <button
-                className="text-xs px-2 py-1 bg-mocha-surface-1 rounded-full border border-mocha text-mocha-subtext0 hover:text-mocha-lavender"
-                onMouseEnter={() => { void fetchRoast(repo); }}
-                onFocus={() => { void fetchRoast(repo); }}
-                title={roasts[repo.id] ?? 'AI Roast'}
-              >
-                🤖 AI Roast
-              </button>
-              {roasts[repo.id] && (
-                <div className="mt-2 text-sm text-mocha-subtext0 bg-mocha-surface-1 border border-mocha rounded-lg p-2">
-                  {roasts[repo.id]}
-                </div>
               )}
             </div>
           </div>
