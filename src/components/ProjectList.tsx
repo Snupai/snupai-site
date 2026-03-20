@@ -3,7 +3,7 @@
 import { useState, useEffect, useLayoutEffect, useRef } from 'react';
 
 type Repo = {
-  id: number;
+  id: string;
   name: string;
   description: string;
   language: string;
@@ -21,8 +21,8 @@ type Repo = {
 export default function ProjectList({ initialRepos }: { initialRepos: Repo[] }) {
   const [sortBy, setSortBy] = useState('lastCommit');
   const [mounted, setMounted] = useState(false);
-  const itemRefs = useRef<Map<number, HTMLElement>>(new Map());
-  const prevRectsRef = useRef<Map<number, DOMRect> | null>(null);
+  const itemRefs = useRef<Map<string, HTMLElement>>(new Map());
+  const prevRectsRef = useRef<Map<string, DOMRect> | null>(null);
   const reduceMotion = typeof window !== 'undefined' && window.matchMedia ? window.matchMedia('(prefers-reduced-motion: reduce)').matches : false;
   
   useEffect(() => {
@@ -32,7 +32,7 @@ export default function ProjectList({ initialRepos }: { initialRepos: Repo[] }) 
   // Animate reordering using FLIP technique
   useLayoutEffect(() => {
     if (reduceMotion) return;
-    const currentRects = new Map<number, DOMRect>();
+    const currentRects = new Map<string, DOMRect>();
     itemRefs.current.forEach((el, id) => {
       currentRects.set(id, el.getBoundingClientRect());
     });

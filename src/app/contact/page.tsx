@@ -1,5 +1,6 @@
 import { type Metadata } from "next";
 import ContactForm from "~/components/ContactForm";
+import { createContactFormToken } from "~/server/contact/security";
 
 export const metadata: Metadata = {
   title: "Contact Snupai",
@@ -20,7 +21,12 @@ export const metadata: Metadata = {
   },
 };
 
+export const dynamic = "force-dynamic";
+
 export default function ContactPage() {
+  const renderedAt = Date.now();
+  const formToken = createContactFormToken(renderedAt);
+
   return (
     <main className="flex flex-col">
       <div className="container mx-auto flex flex-col items-center justify-center gap-8 px-4 py-16">
@@ -97,7 +103,7 @@ export default function ContactPage() {
 
           <div className="rounded-xl bg-mocha-surface p-6 space-y-4">
             <h2 className="text-2xl font-bold highlight-text text-center">Contact via Form</h2>
-            <ContactForm />
+            <ContactForm formToken={formToken} renderedAt={renderedAt} />
           </div>
         </div>
       </div>

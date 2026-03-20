@@ -10,7 +10,10 @@ export default function Footer() {
             <span className="text-mocha-red animate-pulse inline-block">❤</span>
             {' '}by Snupai
           </p>
-          <a href="/imprint" className="underline hover:text-mocha-pink transition-colors mt-1 text-xs">Imprint</a>
+          <div className="mt-1 flex items-center gap-3 text-xs">
+            <a href="/imprint" className="underline hover:text-mocha-pink transition-colors">Imprint</a>
+            <a href="/privacy" className="underline hover:text-mocha-pink transition-colors">Privacy</a>
+          </div>
         </div>
       </div>
     </footer>

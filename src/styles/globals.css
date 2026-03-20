@@ -33,7 +33,9 @@
     --crust: #11111b;
   }
 
-  html, body, #__next {
+  html,
+  body,
+  #__next {
     min-height: 100vh;
     background: #1e1e2e;
     background-color: #1e1e2e;
@@ -55,9 +57,11 @@
   }
 
   .title-highlight {
-    @apply bg-clip-text text-transparent font-bold;
+    @apply bg-clip-text font-bold text-transparent;
     background-size: 200% auto;
-    animation: shine 3s linear infinite, rotate 8s ease-in-out infinite;
+    animation:
+      shine 3s linear infinite,
+      rotate 8s ease-in-out infinite;
     background-image: linear-gradient(
       45deg,
       var(--pink) 0%,
@@ -81,19 +85,54 @@
 
 @keyframes rotate {
   0% {
-    background-image: linear-gradient(45deg, var(--pink) 0%, var(--sapphire) 25%, var(--mauve) 50%, var(--sky) 75%, var(--pink) 100%);
+    background-image: linear-gradient(
+      45deg,
+      var(--pink) 0%,
+      var(--sapphire) 25%,
+      var(--mauve) 50%,
+      var(--sky) 75%,
+      var(--pink) 100%
+    );
   }
   25% {
-    background-image: linear-gradient(135deg, var(--pink) 0%, var(--sapphire) 25%, var(--mauve) 50%, var(--sky) 75%, var(--pink) 100%);
+    background-image: linear-gradient(
+      135deg,
+      var(--pink) 0%,
+      var(--sapphire) 25%,
+      var(--mauve) 50%,
+      var(--sky) 75%,
+      var(--pink) 100%
+    );
   }
   50% {
-    background-image: linear-gradient(225deg, var(--pink) 0%, var(--sapphire) 25%, var(--mauve) 50%, var(--sky) 75%, var(--pink) 100%);
+    background-image: linear-gradient(
+      225deg,
+      var(--pink) 0%,
+      var(--sapphire) 25%,
+      var(--mauve) 50%,
+      var(--sky) 75%,
+      var(--pink) 100%
+    );
   }
   75% {
-    background-image: linear-gradient(315deg, var(--pink) 0%, var(--sapphire) 25%, var(--mauve) 50%, var(--sky) 75%, var(--pink) 100%);
+    background-image: linear-gradient(
+      315deg,
+      var(--pink) 0%,
+      var(--sapphire) 25%,
+      var(--mauve) 50%,
+      var(--sky) 75%,
+      var(--pink) 100%
+    );
   }
   100% {
-    background-image: linear-gradient(405deg, var(--pink) 0%, var(--sapphire) 25%, var(--mauve) 50%, var(--sky) 75%, var(--pink) 100%);
+    background-image: linear-gradient(
+      405deg,
+      var(--pink) 0%,
+      var(--sapphire) 25%,
+      var(--mauve) 50%,
+      var(--sky) 75%,
+      var(--pink) 100%
+    );
   }
 }
 
@@ -102,30 +141,88 @@
     background-color: var(--base);
     color: var(--text);
   }
-  
-  .text-mocha-rosewater { color: var(--rosewater); }
-  .text-mocha-flamingo { color: var(--flamingo); }
-  .text-mocha-pink { color: var(--pink); }
-  .text-mocha-mauve { color: var(--mauve); }
-  .text-mocha-red { color: var(--red); }
-  .text-mocha-maroon { color: var(--maroon); }
-  .text-mocha-peach { color: var(--peach); }
-  .text-mocha-yellow { color: var(--yellow); }
-  .text-mocha-green { color: var(--green); }
-  .text-mocha-teal { color: var(--teal); }
-  .text-mocha-sky { color: var(--sky); }
-  .text-mocha-sapphire { color: var(--sapphire); }
-  .text-mocha-blue { color: var(--blue); }
-  .text-mocha-lavender { color: var(--lavender); }
-  
-  .bg-mocha-surface { background-color: var(--surface0); }
-  .bg-mocha-surface-1 { background-color: var(--surface1); }
-  .bg-mocha-surface-2 { background-color: var(--surface2); }
-  .bg-mocha-overlay { background-color: var(--overlay0); }
-  .bg-mocha-overlay-1 { background-color: var(--overlay1); }
-  .bg-mocha-overlay-2 { background-color: var(--overlay2); }
-  
-  .border-mocha { border-color: var(--overlay0); }
-  .hover\:bg-mocha-surface:hover { background-color: var(--surface0); }
-  .hover\:text-mocha-lavender:hover { color: var(--lavender); }
+
+  .text-mocha-rosewater {
+    color: var(--rosewater);
+  }
+  .text-mocha-flamingo {
+    color: var(--flamingo);
+  }
+  .text-mocha-pink {
+    color: var(--pink);
+  }
+  .text-mocha-mauve {
+    color: var(--mauve);
+  }
+  .text-mocha-red {
+    color: var(--red);
+  }
+  .text-mocha-maroon {
+    color: var(--maroon);
+  }
+  .text-mocha-peach {
+    color: var(--peach);
+  }
+  .text-mocha-yellow {
+    color: var(--yellow);
+  }
+  .text-mocha-green {
+    color: var(--green);
+  }
+  .text-mocha-teal {
+    color: var(--teal);
+  }
+  .text-mocha-sky {
+    color: var(--sky);
+  }
+  .text-mocha-sapphire {
+    color: var(--sapphire);
+  }
+  .text-mocha-blue {
+    color: var(--blue);
+  }
+  .text-mocha-lavender {
+    color: var(--lavender);
+  }
+
+  .bg-mocha-mantle {
+    background-color: var(--mantle);
+  }
+  .bg-mocha-crust {
+    background-color: var(--crust);
+  }
+  .bg-mocha-surface {
+    background-color: var(--surface0);
+  }
+  .bg-mocha-surface-1 {
+    background-color: var(--surface1);
+  }
+  .bg-mocha-surface-2 {
+    background-color: var(--surface2);
+  }
+  .bg-mocha-overlay {
+    background-color: var(--overlay0);
+  }
+  .bg-mocha-overlay-1 {
+    background-color: var(--overlay1);
+  }
+  .bg-mocha-overlay-2 {
+    background-color: var(--overlay2);
+  }
+
+  .border-mocha {
+    border-color: var(--overlay0);
+  }
+  .border-mocha-overlay {
+    border-color: var(--overlay0);
+  }
+  .border-mocha-surface {
+    border-color: var(--surface0);
+  }
+  .hover\:bg-mocha-surface:hover {
+    background-color: var(--surface0);
+  }
+  .hover\:text-mocha-lavender:hover {
+    color: var(--lavender);
+  }
 }

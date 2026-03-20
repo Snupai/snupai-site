@@ -1,88 +1,112 @@
 import { type NextRequest } from "next/server";
-import nodemailer from "nodemailer";
-import { z } from "zod";
-import { env } from "../../../env.js";
+import { contactFormSchema } from "~/lib/contact-form";
+import { sendContactSubmissionEmail } from "~/server/contact/email";
+import {
+  buildContactSubmissionRecord,
+  classifyContactAttempt,
+  getContactAttemptMetadata,
+} from "~/server/contact/security";
+import { storeContactSubmission, updateContactSubmission } from "~/server/contact/store";
 
-const contactFormSchema = z.object({
-  name: z.string().min(2, "Name must be at least 2 characters"),
-  email: z.string().email("Invalid email address"),
-  message: z.string().min(10, "Message must be at least 10 characters"),
-});
-
-// Create the transport config
-const transporter = nodemailer.createTransport({
-  host: env.SMTP_HOST,
-  port: env.SMTP_PORT,
-  secure: false,
-  auth: {
-    user: env.SMTP_USER,
-    pass: env.SMTP_PASS
-  },
-  tls: {
-    rejectUnauthorized: false,
-    minVersion: 'TLSv1.2'
-  }
-});
+function hasReason(reasons: string[], reason: string) {
+  return reasons.includes(reason);
+}
 
 export async function POST(request: NextRequest) {
   try {
     const body = (await request.json()) as unknown;
-    const result = contactFormSchema.safeParse(body);
+    const parsed = contactFormSchema.safeParse(body);
 
-    if (!result.success) {
+    if (!parsed.success) {
       return Response.json(
         { error: "Invalid form data" },
-        { status: 400 }
+        { status: 400 },
       );
     }
 
-    const { name, email, message } = result.data;
+    const metadata = getContactAttemptMetadata(request);
+    const classification = await classifyContactAttempt(parsed.data, metadata);
+    const submission = buildContactSubmissionRecord(parsed.data, metadata, classification.status, classification.reasons);
 
-    try {
-      await transporter.sendMail({
-        from: `"Contact Form" <${env.SMTP_USER}>`,
-        to: env.SMTP_TO_ADDRESS,
-        replyTo: email,
-        subject: `New Contact Form Submission from ${name}`,
-        text: `
-Name: ${name}
-Email: ${email}
+    await storeContactSubmission(submission);
 
-Message:
-${message}
-        `,
-        html: `
-<h2>New Contact Form Submission</h2>
-<p><strong>Name:</strong> ${name}</p>
-<p><strong>Email:</strong> ${email}</p>
-<br>
-<p><strong>Message:</strong></p>
-<p>${message.replace(/\n/g, '<br>')}</p>
-        `,
-      });
+    if (classification.status === "accepted") {
+      try {
+        const adminReviewUrl = `${new URL(request.url).origin}/admin/contact-submissions`;
+        await sendContactSubmissionEmail(submission, adminReviewUrl);
+        await updateContactSubmission(submission.id, (record) => ({
+          ...record,
+          delivery: "sent",
+        }));
 
-      return Response.json({ success: true });
-    } catch (emailError) {
-      console.error('Email sending error:', emailError);
-      
-      // Check for rate limit or quota exceeded
-      if (typeof emailError === 'object' && 
-          emailError !== null && 
-          'responseCode' in emailError && 
-          emailError.responseCode === 450) {
-        return Response.json(
-          { error: "Email service temporarily unavailable. Please try again later." },
-          { status: 503 }
-        );
+        return Response.json({ success: true });
+      } catch (emailError) {
+        console.error("Email sending error:", emailError);
+        await updateContactSubmission(submission.id, (record) => ({
+          ...record,
+          delivery: "failed",
+        }));
+
+        if (
+          typeof emailError === "object"
+          && emailError !== null
+          && "responseCode" in emailError
+          && emailError.responseCode === 450
+        ) {
+          return Response.json(
+            { error: "Email service temporarily unavailable. Please try again later." },
+            { status: 503 },
+          );
+        }
+
+        throw emailError;
       }
-
-      throw emailError; // Re-throw for general error handling
     }
+
+    if (classification.status === "suppressed") {
+      return Response.json({ success: true });
+    }
+
+    if (
+      hasReason(classification.reasons, "rate_limited_10m")
+      || hasReason(classification.reasons, "rate_limited_24h")
+    ) {
+      return Response.json(
+        {
+          error: "Too many requests. Please try again later.",
+          retryAfter: Math.ceil(classification.retryAfterSeconds / 60),
+        },
+        {
+          status: 429,
+          headers: {
+            "Retry-After": String(classification.retryAfterSeconds),
+          },
+        },
+      );
+    }
+
+    if (
+      hasReason(classification.reasons, "form_token_invalid")
+      || hasReason(classification.reasons, "form_token_expired")
+    ) {
+      return Response.json(
+        {
+          error: "This contact form has expired. Please refresh the page and try again.",
+          code: "refresh_required",
+        },
+        { status: 400 },
+      );
+    }
+
+    return Response.json(
+      { error: "This request was blocked." },
+      { status: 403 },
+    );
   } catch (error) {
-    console.error('Contact form error:', error);
+    console.error("Contact form error:", error);
     return Response.json(
       { error: "Failed to send message. Please try again later." },
-      { status: 500 }
+      { status: 500 },
     );
   }
-} 
+}
