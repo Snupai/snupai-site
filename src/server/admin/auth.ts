@@ -14,7 +14,7 @@ export async function requireAdminSession(callbackPath = "/admin") {
   const session = await getAdminSession();
 
   if (!session) {
-    redirect(`/api/auth/signin?callbackUrl=${encodeURIComponent(callbackPath)}`);
+    redirect(`/auth/signin?callbackUrl=${encodeURIComponent(callbackPath)}`);
   }
 
   return session;
