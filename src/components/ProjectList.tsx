@@ -73,7 +73,7 @@ export default function ProjectList({ initialRepos }: { initialRepos: Repo[] }) 
   }
 
   return (
-    <div className="flex flex-col gap-4 w-full max-w-5xl">
+    <div className="mx-auto flex w-full max-w-5xl flex-col gap-4">
       <div className="flex justify-end gap-4">
         <div className="relative">
           <select 

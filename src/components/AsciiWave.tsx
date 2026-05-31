@@ -79,7 +79,7 @@ export default function AsciiWave({ className, interactive = true }: AsciiWavePr
 
           // Pointer interaction: a soft, slow swell near the cursor with a
           // faint radiating ripple. Kept low-amplitude so it never overpowers
-          // the ambient waves — just a gentle intensity shift around the cursor.
+          // the ambient waves, just a gentle intensity shift around the cursor.
           if (influence > 0.001 && pointerX >= 0) {
             const dx = (x - pointerX) * 0.16;
             const dy = (y - pointerY) * 0.28;

@@ -52,7 +52,7 @@ export default function AboutPage() {
       <div className="container mx-auto flex max-w-3xl flex-col gap-12 px-4 py-16 sm:py-20">
         <PageHeader
           kicker="about"
-          subtitle="Student, programmer, and automation engineer — coding for fun."
+          subtitle="Student, programmer, and automation engineer. Coding for fun."
         >
           About <span className="title-highlight">Snupai</span>
         </PageHeader>
@@ -99,7 +99,7 @@ export default function AboutPage() {
             </h2>
             <p className="leading-relaxed text-mocha-subtext">
               {
-                "Snupai is a nickname from my friends — not sure why, but it stuck. It's a mix of Snu Snu and Senpai. "
+                "Snupai is a nickname from my friends, not sure why, but it stuck. It's a mix of Snu Snu and Senpai. "
               }
               {"Senpai is Japanese for an older student or mentor. Snu Snu is... well, I won't explain that one here."}
             </p>

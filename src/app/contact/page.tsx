@@ -40,7 +40,7 @@ export default function ContactPage() {
       <div className="container mx-auto flex max-w-2xl flex-col gap-12 px-4 py-16 sm:py-20">
         <PageHeader
           kicker="contact"
-          subtitle="Not sure why you'd want to — but here's how to reach me."
+          subtitle="Not sure why you'd want to, but here's how to reach me."
         >
           Contact <span className="title-highlight">Snupai</span>
         </PageHeader>
