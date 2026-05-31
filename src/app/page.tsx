@@ -1,6 +1,7 @@
 import Link from "next/link";
 import ClickableTitle from "~/components/ClickableTitle";
 import AsciiWave from "~/components/AsciiWave";
+import CustomCursor from "~/components/CustomCursor";
 import { type Metadata } from "next";
 
 export const metadata: Metadata = {
@@ -30,36 +31,51 @@ const links = [
 
 export default function HomePage() {
   return (
-    <main className="flex min-h-[calc(100vh-9rem)] flex-col items-center justify-center px-6 py-20">
-      <div className="flex w-full max-w-xl flex-col items-center gap-10">
-        {/* Subtle ASCII wave centerpiece */}
-        <div className="relative w-full">
-          <AsciiWave
-            className="h-40 w-full text-[0.55rem] text-mocha-overlay-2 opacity-50 [mask-image:radial-gradient(ellipse_at_center,black_30%,transparent_75%)] sm:h-48 sm:text-[0.7rem]"
-          />
+    <main className="relative flex min-h-[calc(100vh-9rem)] flex-col items-center justify-center overflow-hidden px-6 py-20 md:cursor-none">
+      <CustomCursor />
+
+      {/* Full-bleed interactive ASCII field as a living backdrop */}
+      <AsciiWave
+        className="absolute inset-0 h-full w-full text-[0.6rem] leading-[0.9rem] text-mocha-overlay-1 opacity-[0.22] [mask-image:radial-gradient(ellipse_60%_60%_at_50%_45%,black,transparent_85%)] sm:text-[0.72rem]"
+      />
+
+      {/* Content overlay */}
+      <div className="relative z-10 flex w-full max-w-lg flex-col items-center gap-7 text-center">
+        {/* Mono kicker with a soft live indicator */}
+        <div className="flex items-center gap-2 font-mono text-xs uppercase tracking-[0.35em] text-mocha-overlay-2">
+          <span className="relative flex h-1.5 w-1.5">
+            <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-mocha-lavender opacity-60" />
+            <span className="relative inline-flex h-1.5 w-1.5 rounded-full bg-mocha-lavender" />
+          </span>
+          welcome
         </div>
 
         {/* Title */}
-        <h1 className="text-center text-4xl font-extrabold tracking-tight sm:text-6xl">
+        <h1 className="text-5xl font-extrabold tracking-tight sm:text-7xl">
           <ClickableTitle text="snupai.me" url="https://snupai.me" />
         </h1>
 
-        {/* Minimal calm copy */}
-        <p className="max-w-md text-balance text-center text-base leading-relaxed text-mocha-subtext sm:text-lg">
-          Hello, and welcome. A quiet corner of the internet — feel free to look
-          around.
+        {/* One calm line */}
+        <p className="max-w-sm text-balance text-base leading-relaxed text-mocha-subtext">
+          A quiet corner of the internet. Move your cursor — the waves follow.
         </p>
 
-        {/* Minimal navigation links */}
-        <nav className="flex flex-wrap items-center justify-center gap-2">
-          {links.map((link) => (
-            <Link
-              key={link.href}
-              href={link.href}
-              className="rounded-full border border-mocha-surface px-5 py-2 text-sm font-medium text-mocha-subtext transition-colors hover:border-mocha-overlay hover:text-mocha-lavender"
-            >
-              {link.label}
-            </Link>
+        {/* Inline mono navigation */}
+        <nav className="mt-2 flex items-center gap-1 font-mono text-sm">
+          {links.map((link, i) => (
+            <span key={link.href} className="flex items-center gap-1">
+              {i > 0 && (
+                <span aria-hidden="true" className="px-1 text-mocha-overlay-1">
+                  /
+                </span>
+              )}
+              <Link
+                href={link.href}
+                className="rounded px-2 py-1 text-mocha-subtext transition-colors hover:text-mocha-lavender"
+              >
+                {link.label}
+              </Link>
+            </span>
           ))}
         </nav>
       </div>

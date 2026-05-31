@@ -7,18 +7,20 @@ const RAMP = ' ·.:-=+*#%@';
 
 interface AsciiWaveProps {
   className?: string;
+  /** Multiplier for how strongly the pointer disturbs the field. */
+  interactive?: boolean;
 }
 
 /**
- * A subtle, calm ASCII wave-field animation.
+ * A calm, interactive ASCII wave-field.
  *
- * Renders a grid of monospace characters whose density is driven by a few
- * overlapping sine waves, producing a slow, meditative rippling motion.
- * The grid size adapts to the container for full responsiveness, and the
- * animation is throttled and pauses when off-screen or when the user prefers
- * reduced motion.
+ * A grid of monospace glyphs whose density is driven by a few overlapping
+ * sine waves, producing slow, meditative ripples. The pointer adds a soft
+ * radial swell that follows the cursor, so the field feels alive without
+ * being noisy. The grid adapts to its container, throttles to a low frame
+ * rate, pauses off-screen, and respects prefers-reduced-motion.
  */
-export default function AsciiWave({ className }: AsciiWaveProps) {
+export default function AsciiWave({ className, interactive = true }: AsciiWaveProps) {
   const preRef = useRef<HTMLPreElement>(null);
 
   useEffect(() => {
@@ -29,15 +31,24 @@ export default function AsciiWave({ className }: AsciiWaveProps) {
       '(prefers-reduced-motion: reduce)',
     ).matches;
 
-    // Character cell size in px (approx) used to compute grid dimensions.
     const CELL_W = 9;
     const CELL_H = 16;
 
     let cols = 0;
     let rows = 0;
+    let width = 0;
+    let height = 0;
+
+    // Pointer position in grid coordinates (-1 means "no pointer").
+    let pointerX = -1;
+    let pointerY = -1;
+    // Smoothed pointer influence (eases in/out).
+    let influence = 0;
 
     const measure = () => {
       const rect = pre.getBoundingClientRect();
+      width = rect.width;
+      height = rect.height;
       cols = Math.max(12, Math.floor(rect.width / CELL_W));
       rows = Math.max(8, Math.floor(rect.height / CELL_H));
     };
@@ -46,22 +57,35 @@ export default function AsciiWave({ className }: AsciiWaveProps) {
       const t = time * 0.0004;
       const cx = cols / 2;
       const cy = rows / 2;
+
+      // Ease the pointer influence toward its target.
+      const target = pointerX >= 0 ? 1 : 0;
+      influence += (target - influence) * 0.08;
+
       let out = '';
 
       for (let y = 0; y < rows; y++) {
         for (let x = 0; x < cols; x++) {
-          // Normalize coordinates (account for character aspect ratio).
           const nx = (x - cx) * 0.18;
           const ny = (y - cy) * 0.32;
           const dist = Math.sqrt(nx * nx + ny * ny);
 
-          const v =
+          let v =
             Math.sin(nx + t) +
             Math.sin(ny * 0.8 - t * 0.7) +
             Math.sin((nx + ny) * 0.5 + t * 0.5) +
             Math.sin(dist * 1.6 - t * 1.2);
 
-          // Map from [-4, 4] to [0, 1].
+          // Pointer ripple: a travelling wave radiating from the cursor.
+          if (influence > 0.001 && pointerX >= 0) {
+            const dx = (x - pointerX) * 0.18;
+            const dy = (y - pointerY) * 0.32;
+            const pd = Math.sqrt(dx * dx + dy * dy);
+            const ripple = Math.sin(pd * 2.2 - time * 0.006) * Math.exp(-pd * 0.35);
+            v += ripple * 2.6 * influence;
+          }
+
+          // Map from [-4, 4]-ish to [0, 1].
           const n = (v + 4) / 8;
           const idx = Math.min(
             RAMP.length - 1,
@@ -78,7 +102,7 @@ export default function AsciiWave({ className }: AsciiWaveProps) {
     let frameId = 0;
     let lastFrame = 0;
     let running = true;
-    const FRAME_INTERVAL = 1000 / 18; // ~18fps for a calm, gentle motion
+    const FRAME_INTERVAL = 1000 / 20; // ~20fps, calm but responsive to pointer
 
     const loop = (time: number) => {
       if (!running) return;
@@ -89,13 +113,29 @@ export default function AsciiWave({ className }: AsciiWaveProps) {
       frameId = requestAnimationFrame(loop);
     };
 
+    const onPointerMove = (e: PointerEvent) => {
+      if (!interactive || prefersReducedMotion) return;
+      const rect = pre.getBoundingClientRect();
+      const relX = (e.clientX - rect.left) / width;
+      const relY = (e.clientY - rect.top) / height;
+      pointerX = relX * cols;
+      pointerY = relY * rows;
+    };
+
+    const onPointerLeave = () => {
+      pointerX = -1;
+      pointerY = -1;
+    };
+
     measure();
 
     if (prefersReducedMotion) {
-      // Draw a single static frame and stop.
       render(0);
     } else {
       frameId = requestAnimationFrame(loop);
+      window.addEventListener('pointermove', onPointerMove, { passive: true });
+      window.addEventListener('pointerdown', onPointerMove, { passive: true });
+      document.addEventListener('pointerleave', onPointerLeave);
     }
 
     const resizeObserver = new ResizeObserver(() => {
@@ -104,7 +144,6 @@ export default function AsciiWave({ className }: AsciiWaveProps) {
     });
     resizeObserver.observe(pre);
 
-    // Pause when the tab/section is not visible to save resources.
     const visObserver = new IntersectionObserver(
       (entries) => {
         const entry = entries[0];
@@ -128,8 +167,11 @@ export default function AsciiWave({ className }: AsciiWaveProps) {
       cancelAnimationFrame(frameId);
       resizeObserver.disconnect();
       visObserver.disconnect();
+      window.removeEventListener('pointermove', onPointerMove);
+      window.removeEventListener('pointerdown', onPointerMove);
+      document.removeEventListener('pointerleave', onPointerLeave);
     };
-  }, []);
+  }, [interactive]);
 
   return (
     <pre
