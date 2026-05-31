@@ -18,7 +18,7 @@ export default function SiteBackground() {
         aria-hidden="true"
         className="pointer-events-none fixed inset-0 -z-10 flex items-center justify-center"
       >
-        <AsciiWave className="h-full w-full text-[0.6rem] leading-[0.9rem] text-mocha-overlay-1 opacity-[0.16] [mask-image:radial-gradient(ellipse_72%_72%_at_50%_45%,black,transparent_88%)] sm:text-[0.72rem]" />
+        <AsciiWave className="h-full w-full text-[0.6rem] leading-[0.9rem] text-mocha-lavender opacity-[0.38] [mask-image:radial-gradient(ellipse_75%_75%_at_50%_45%,black,transparent_92%)] sm:text-[0.72rem]" />
       </div>
       <CustomCursor />
     </>

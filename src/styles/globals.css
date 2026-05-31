@@ -34,7 +34,6 @@
   }
 
   html,
-  body,
   #__next {
     min-height: 100vh;
     background: #1e1e2e;
@@ -45,8 +44,9 @@
     color: var(--text);
     font-family: inherit;
     min-height: 100vh;
-    background: #1e1e2e;
-    background-color: #1e1e2e;
+    /* Transparent so the fixed ASCII background layer (-z-10) shows through.
+       The base color comes from <html>. */
+    background: transparent;
     overflow-x: hidden;
   }
 }
