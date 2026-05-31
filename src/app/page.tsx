@@ -21,41 +21,53 @@ export const metadata: Metadata = {
   },
 };
 
+const links = [
+  { href: "/about", label: "About" },
+  { href: "/projects", label: "Projects" },
+  { href: "/contact", label: "Contact" },
+];
+
 export default function HomePage() {
   return (
-    <main className="flex flex-col">
-      <div className="container mx-auto flex flex-col items-center justify-center gap-12 px-4 py-16">
-        <h1 className="text-center text-4xl font-extrabold tracking-tight sm:text-5xl md:text-[5rem]">
-          <span className="block">Welcome to</span>
+    <main className="relative flex min-h-[calc(100vh-9rem)] flex-col items-center justify-center px-6 py-20">
+      <div className="flex w-full max-w-lg flex-col items-center gap-7 text-center">
+        {/* Mono kicker with a soft live indicator */}
+        <div className="flex items-center gap-2 font-mono text-xs uppercase tracking-[0.35em] text-mocha-overlay-2">
+          <span className="relative flex h-1.5 w-1.5">
+            <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-mocha-lavender opacity-60" />
+            <span className="relative inline-flex h-1.5 w-1.5 rounded-full bg-mocha-lavender" />
+          </span>
+          welcome
+        </div>
+
+        {/* Title */}
+        <h1 className="text-5xl font-extrabold tracking-tight sm:text-7xl">
           <ClickableTitle text="snupai.me" url="https://snupai.me" />
         </h1>
-        <p className="max-w-3xl text-center text-lg space-y-6">
-          Oh, you found my website.
-          <br />
-          I&apos;m not sure if there&apos;s anything worth looking at here. But feel free to look around.
-          <br />
-          <span className="opacity-0 hover:opacity-100 transition-opacity duration-300">You&apos;re amazing and deserve all the headpats!<br/>Have a wonderful day filled with joy and happiness! ❤️</span>
+
+        {/* One calm line */}
+        <p className="max-w-sm text-balance text-base leading-relaxed text-mocha-subtext">
+          I'm a student, programmer, and automation engineer. Here's where I share my projects or so.
         </p>
-        <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 md:gap-8">
-          <Link
-            className="flex max-w-xs flex-col gap-4 rounded-xl bg-mocha-surface p-4 hover:bg-mocha-surface-1 transition-colors"
-            href="/projects"
-          >
-            <h3 className="text-2xl font-bold">My Projects →</h3>
-            <div className="text-lg">
-              Explore my bad code.
-            </div>
-          </Link>
-          <Link
-            className="flex max-w-xs flex-col gap-4 rounded-xl bg-mocha-surface p-4 hover:bg-mocha-surface-1 transition-colors"
-            href="/contact"
-          >
-            <h3 className="text-2xl font-bold">Contact Me →</h3>
-            <div className="text-lg">
-              Do you want to contact me? I am not sure why you would want to but here you go.
-            </div>
-          </Link>
-        </div>
+
+        {/* Inline mono navigation */}
+        <nav className="mt-2 flex items-center gap-1 font-mono text-sm">
+          {links.map((link, i) => (
+            <span key={link.href} className="flex items-center gap-1">
+              {i > 0 && (
+                <span aria-hidden="true" className="px-1 text-mocha-overlay-1">
+                  /
+                </span>
+              )}
+              <Link
+                href={link.href}
+                className="rounded px-2 py-1 text-mocha-subtext transition-colors hover:text-mocha-lavender"
+              >
+                {link.label}
+              </Link>
+            </span>
+          ))}
+        </nav>
       </div>
     </main>
   );

@@ -1,6 +1,7 @@
 import { type Metadata } from "next";
 import ContactForm from "~/components/ContactForm";
 import { createContactFormToken } from "~/server/contact/security";
+import PageHeader from "~/components/PageHeader";
 
 export const metadata: Metadata = {
   title: "Contact Snupai",
@@ -23,90 +24,85 @@ export const metadata: Metadata = {
 
 export const dynamic = "force-dynamic";
 
+const socials = [
+  { label: "Discord", value: "@snupai", href: "https://discord.com/users/239809113125552129/" },
+  { label: "GitHub", value: "Snupai", href: "https://github.com/Snupai" },
+  { label: "Bluesky", value: "@snupai.moe", href: "https://bsky.app/profile/snupai.moe" },
+  { label: "X", value: "@Snupai", href: "https://x.com/Snupai" },
+];
+
 export default function ContactPage() {
   const renderedAt = Date.now();
   const formToken = createContactFormToken(renderedAt);
 
   return (
     <main className="flex flex-col">
-      <div className="container mx-auto flex flex-col items-center justify-center gap-8 px-4 py-16">
-        <h1 className="text-5xl font-extrabold tracking-tight sm:text-[4rem]">
+      <div className="container mx-auto flex max-w-2xl flex-col gap-12 px-4 py-16 sm:py-20">
+        <PageHeader
+          kicker="contact"
+          subtitle="Not sure why you'd want to, but here's how to reach me."
+        >
           Contact <span className="title-highlight">Snupai</span>
-        </h1>
+        </PageHeader>
 
-        <div className="max-w-2xl w-full space-y-8">
-          <div className="rounded-xl bg-mocha-surface p-6 space-y-6">
-            <div className="space-y-2">
-              <h2 className="text-2xl font-bold highlight-text">Get in Touch</h2>
-              <p className="text-lg">
-                Do you want to contact me? I am not sure why you would want to but here you go.
-              </p>
-            </div>
-
-            <div className="space-y-4">
-              <div className="rounded-lg bg-mocha-mantle p-4">
-                <h3 className="font-bold">Email</h3>
-                <a 
-                  href="mailto:nya@snupai.me" 
-                  className="highlight-text"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                >
-                  nya@snupai.me
-                </a>
-              </div>
-
-              <div className="rounded-lg bg-mocha-mantle p-4">
-                <h3 className="font-bold">Location</h3>
-                <p className="highlight-text">Heaven</p>
-              </div>
-
-              <div className="rounded-lg bg-mocha-mantle p-4">
-                <h3 className="font-bold">Social Media</h3>
-                <div className="flex flex-col sm:flex-row gap-2 sm:gap-4 mt-2">
-                  <div>
-                    Discord: <a 
-                      href="https://discord.com/users/239809113125552129/"
-                      className="highlight-text"
-                      target="_blank"
-                      rel="noopener noreferrer"
-                    >@snupai</a>
-                  </div>
-                  <div>
-                    GitHub: <a
-                      href="https://github.com/Snupai"
-                      className="highlight-text"
-                      target="_blank"
-                      rel="noopener noreferrer"
-                    >Snupai</a>
-                  </div>
-                  <div>
-                    Bluesky: <a
-                      href="https://bsky.app/profile/snupai.moe"
-                      className="highlight-text"
-                      target="_blank"
-                      rel="noopener noreferrer"
-                    >@snupai.moe</a>
-                  </div>
-                  <div>
-                    X: <a
-                      href="https://x.com/Snupai"
-                      className="highlight-text"
-                      target="_blank"
-                      rel="noopener noreferrer"
-                    >@Snupai</a>
-                  </div>
-                </div>
-              </div>
-            </div>
+        {/* Primary contact details */}
+        <div className="grid gap-4 sm:grid-cols-2">
+          <div className="rounded-2xl border border-mocha-surface bg-mocha-mantle/60 p-5 backdrop-blur-sm transition-colors hover:border-mocha-lavender">
+            <p className="mb-1 font-mono text-xs uppercase tracking-[0.25em] text-mocha-overlay-2">
+              Email
+            </p>
+            <a
+              href="mailto:nya@snupai.me"
+              className="text-lg highlight-text"
+              target="_blank"
+              rel="noopener noreferrer"
+            >
+              nya@snupai.me
+            </a>
           </div>
 
-          <div className="rounded-xl bg-mocha-surface p-6 space-y-4">
-            <h2 className="text-2xl font-bold highlight-text text-center">Contact via Form</h2>
-            <ContactForm formToken={formToken} renderedAt={renderedAt} />
+          <div className="rounded-2xl border border-mocha-surface bg-mocha-mantle/60 p-5 backdrop-blur-sm transition-colors hover:border-mocha-lavender">
+            <p className="mb-1 font-mono text-xs uppercase tracking-[0.25em] text-mocha-overlay-2">
+              Location
+            </p>
+            <p className="text-lg text-mocha-subtext">Heaven</p>
           </div>
+        </div>
+
+        {/* Social links */}
+        <div className="rounded-2xl border border-mocha-surface bg-mocha-mantle/60 p-6 backdrop-blur-sm">
+          <p className="mb-4 font-mono text-xs uppercase tracking-[0.25em] text-mocha-lavender">
+            Social media
+          </p>
+          <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
+            {socials.map((s) => (
+              <a
+                key={s.label}
+                href={s.href}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="group flex flex-col gap-1 rounded-xl border border-mocha-surface bg-mocha-surface/30 px-4 py-3 transition-colors hover:border-mocha-pink"
+              >
+                <span className="text-xs text-mocha-overlay-2">{s.label}</span>
+                <span className="text-sm text-mocha-subtext transition-colors group-hover:text-mocha-pink">
+                  {s.value}
+                </span>
+              </a>
+            ))}
+          </div>
+        </div>
+
+        {/* Contact form */}
+        <div className="rounded-2xl border border-mocha-surface bg-mocha-mantle/60 p-6 backdrop-blur-sm">
+          <p className="mb-1 font-mono text-xs uppercase tracking-[0.25em] text-mocha-lavender">
+            Send a message
+          </p>
+          <p className="mb-5 text-sm text-mocha-subtext">
+            Prefer a form? Drop me a line below.
+          </p>
+          <ContactForm formToken={formToken} renderedAt={renderedAt} />
         </div>
       </div>
     </main>
   );
-} 
+}

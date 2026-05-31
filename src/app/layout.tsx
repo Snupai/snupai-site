@@ -5,6 +5,7 @@ import { type Metadata } from "next";
 import { TRPCReactProvider } from "~/trpc/react";
 import Footer from "~/components/Footer";
 import Navigation from "~/components/Navigation";
+import SiteBackground from "~/components/SiteBackground";
 
 export const metadata: Metadata = {
   metadataBase: new URL("https://snupai.me"),
@@ -23,9 +24,10 @@ export default function RootLayout({
     <html lang="en" className={`${GeistSans.variable}`}>
       <body>
         <TRPCReactProvider>
-          <div className="flex flex-col min-h-screen bg-mocha">
+          <div className="relative flex min-h-screen flex-col">
+            <SiteBackground />
             <Navigation />
-            <div className="flex-grow">
+            <div className="relative z-10 flex-grow">
               {children}
             </div>
             <Footer />

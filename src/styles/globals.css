@@ -34,7 +34,6 @@
   }
 
   html,
-  body,
   #__next {
     min-height: 100vh;
     background: #1e1e2e;
@@ -45,8 +44,9 @@
     color: var(--text);
     font-family: inherit;
     min-height: 100vh;
-    background: #1e1e2e;
-    background-color: #1e1e2e;
+    /* Transparent so the fixed ASCII background layer (-z-10) shows through.
+       The base color comes from <html>. */
+    background: transparent;
     overflow-x: hidden;
   }
 }
@@ -184,6 +184,15 @@
   .text-mocha-lavender {
     color: var(--lavender);
   }
+  .text-mocha-subtext {
+    color: var(--subtext0);
+  }
+  .text-mocha-overlay-1 {
+    color: var(--overlay1);
+  }
+  .text-mocha-overlay-2 {
+    color: var(--overlay2);
+  }
 
   .bg-mocha-mantle {
     background-color: var(--mantle);
@@ -210,6 +219,10 @@
     background-color: var(--overlay2);
   }
 
+  .bg-mocha-lavender-soft {
+    background-color: rgba(180, 190, 254, 0.12);
+  }
+
   .border-mocha {
     border-color: var(--overlay0);
   }
@@ -218,6 +231,12 @@
   }
   .border-mocha-surface {
     border-color: var(--surface0);
+  }
+  .border-mocha-lavender {
+    border-color: var(--lavender);
+  }
+  .border-mocha-pink {
+    border-color: var(--pink);
   }
   .hover\:bg-mocha-surface:hover {
     background-color: var(--surface0);

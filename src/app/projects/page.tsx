@@ -1,6 +1,7 @@
 import ProjectList from "~/components/ProjectList";
 import { type Metadata } from "next";
 import { listResolvedProjectsForPublic } from "~/server/projects/store";
+import PageHeader from "~/components/PageHeader";
 
 export const metadata: Metadata = {
   title: "Snupai's Projects",
@@ -25,15 +26,27 @@ export default async function ProjectsPage() {
   const { owned, shoutout } = await listResolvedProjectsForPublic();
   return (
     <main className="flex flex-col">
-      <div className="container mx-auto flex flex-col items-center justify-center gap-8 px-4 py-16">
-        <h1 className="text-5xl font-extrabold tracking-tight sm:text-[4rem]">
+      <div className="container mx-auto flex flex-col gap-16 px-4 py-16 sm:py-20">
+        <PageHeader
+          kicker="projects"
+          subtitle="Things I've built and a few I simply love to recommend."
+        >
           My <span className="title-highlight">Projects</span>
-        </h1>
-        <ProjectList initialRepos={owned} />
-        <h1 className="text-5xl font-extrabold tracking-tight sm:text-[4rem]">
-          <span className="title-highlight">Projects</span> I love and recommend
-        </h1>
-        <ProjectList initialRepos={shoutout} />
+        </PageHeader>
+
+        <section className="mx-auto w-full max-w-5xl flex flex-col gap-6">
+          <span className="font-mono text-xs uppercase tracking-[0.25em] text-mocha-lavender">
+            built by me
+          </span>
+          <ProjectList initialRepos={owned} />
+        </section>
+
+        <section className="mx-auto w-full max-w-5xl flex flex-col gap-6">
+          <span className="font-mono text-xs uppercase tracking-[0.25em] text-mocha-lavender">
+            love &amp; recommend
+          </span>
+          <ProjectList initialRepos={shoutout} />
+        </section>
       </div>
     </main>
   );
