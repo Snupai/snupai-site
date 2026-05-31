@@ -100,7 +100,7 @@ export default function ProjectList({ initialRepos }: { initialRepos: Repo[] }) 
               if (el) itemRefs.current.set(repo.id, el);
               else itemRefs.current.delete(repo.id);
             }}
-            className="rounded-xl bg-mocha-surface p-6 space-y-4 min-w-[320px] will-change-transform"
+            className="rounded-xl border border-mocha-surface bg-mocha-mantle/60 p-6 space-y-4 min-w-[320px] will-change-transform backdrop-blur-sm transition-colors hover:border-mocha-lavender"
           >
             <div className="flex justify-between items-start gap-4">
               <div className="space-y-1 min-w-0">
@@ -132,12 +132,12 @@ export default function ProjectList({ initialRepos }: { initialRepos: Repo[] }) 
                 </span>
               )}
               {repo.language && (
-                <span className="px-3 py-1 rounded-full bg-mocha-surface-1 text-sm flex items-center gap-2">
+                <span className="px-3 py-1 rounded-full bg-mocha-surface/50 text-sm flex items-center gap-2">
                   <span className="w-2 h-2 inline-block rounded-full bg-[#3572A5] mr-2"></span>
                   {repo.language}
                 </span>
               )}
-              <span className="px-3 py-1 rounded-full bg-mocha-surface-1 text-sm text-mocha-subtext0">
+              <span className="px-3 py-1 rounded-full bg-mocha-surface/50 text-sm text-mocha-subtext0">
                 Last commit: {formatDate(repo.last_commit)}
               </span>
             </div>
