@@ -1,5 +1,6 @@
 import Link from "next/link";
 import ClickableTitle from "~/components/ClickableTitle";
+import AsciiWave from "~/components/AsciiWave";
 import { type Metadata } from "next";
 
 export const metadata: Metadata = {
@@ -21,41 +22,46 @@ export const metadata: Metadata = {
   },
 };
 
+const links = [
+  { href: "/about", label: "About" },
+  { href: "/projects", label: "Projects" },
+  { href: "/contact", label: "Contact" },
+];
+
 export default function HomePage() {
   return (
-    <main className="flex flex-col">
-      <div className="container mx-auto flex flex-col items-center justify-center gap-12 px-4 py-16">
-        <h1 className="text-center text-4xl font-extrabold tracking-tight sm:text-5xl md:text-[5rem]">
-          <span className="block">Welcome to</span>
+    <main className="flex min-h-[calc(100vh-9rem)] flex-col items-center justify-center px-6 py-20">
+      <div className="flex w-full max-w-xl flex-col items-center gap-10">
+        {/* Subtle ASCII wave centerpiece */}
+        <div className="relative w-full">
+          <AsciiWave
+            className="h-40 w-full text-[0.55rem] text-mocha-overlay-2 opacity-50 [mask-image:radial-gradient(ellipse_at_center,black_30%,transparent_75%)] sm:h-48 sm:text-[0.7rem]"
+          />
+        </div>
+
+        {/* Title */}
+        <h1 className="text-center text-4xl font-extrabold tracking-tight sm:text-6xl">
           <ClickableTitle text="snupai.me" url="https://snupai.me" />
         </h1>
-        <p className="max-w-3xl text-center text-lg space-y-6">
-          Oh, you found my website.
-          <br />
-          I&apos;m not sure if there&apos;s anything worth looking at here. But feel free to look around.
-          <br />
-          <span className="opacity-0 hover:opacity-100 transition-opacity duration-300">You&apos;re amazing and deserve all the headpats!<br/>Have a wonderful day filled with joy and happiness! ❤️</span>
+
+        {/* Minimal calm copy */}
+        <p className="max-w-md text-balance text-center text-base leading-relaxed text-mocha-subtext sm:text-lg">
+          Hello, and welcome. A quiet corner of the internet — feel free to look
+          around.
         </p>
-        <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 md:gap-8">
-          <Link
-            className="flex max-w-xs flex-col gap-4 rounded-xl bg-mocha-surface p-4 hover:bg-mocha-surface-1 transition-colors"
-            href="/projects"
-          >
-            <h3 className="text-2xl font-bold">My Projects →</h3>
-            <div className="text-lg">
-              Explore my bad code.
-            </div>
-          </Link>
-          <Link
-            className="flex max-w-xs flex-col gap-4 rounded-xl bg-mocha-surface p-4 hover:bg-mocha-surface-1 transition-colors"
-            href="/contact"
-          >
-            <h3 className="text-2xl font-bold">Contact Me →</h3>
-            <div className="text-lg">
-              Do you want to contact me? I am not sure why you would want to but here you go.
-            </div>
-          </Link>
-        </div>
+
+        {/* Minimal navigation links */}
+        <nav className="flex flex-wrap items-center justify-center gap-2">
+          {links.map((link) => (
+            <Link
+              key={link.href}
+              href={link.href}
+              className="rounded-full border border-mocha-surface px-5 py-2 text-sm font-medium text-mocha-subtext transition-colors hover:border-mocha-overlay hover:text-mocha-lavender"
+            >
+              {link.label}
+            </Link>
+          ))}
+        </nav>
       </div>
     </main>
   );

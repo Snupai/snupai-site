@@ -184,6 +184,15 @@
   .text-mocha-lavender {
     color: var(--lavender);
   }
+  .text-mocha-subtext {
+    color: var(--subtext0);
+  }
+  .text-mocha-overlay-1 {
+    color: var(--overlay1);
+  }
+  .text-mocha-overlay-2 {
+    color: var(--overlay2);
+  }
 
   .bg-mocha-mantle {
     background-color: var(--mantle);
