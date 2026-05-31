@@ -77,7 +77,7 @@ export default function ProjectList({ initialRepos }: { initialRepos: Repo[] }) 
       <div className="flex justify-end gap-4">
         <div className="relative">
           <select 
-            className="border border-mocha-surface bg-mocha-mantle/60 px-4 py-2 pr-10 rounded-lg text-mocha-text appearance-none backdrop-blur-sm transition-colors hover:border-mocha-lavender"
+            className="border border-mocha-surface bg-transparent px-4 py-2 pr-10 rounded-lg text-mocha-text appearance-none backdrop-blur-sm transition-colors hover:border-mocha-lavender"
             value={sortBy}
             onChange={(e) => setSortBy(e.target.value)}
           >
