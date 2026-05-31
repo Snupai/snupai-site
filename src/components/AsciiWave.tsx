@@ -61,6 +61,11 @@ export default function AsciiWave({
     let rows = 0;
     let width = 0;
     let height = 0;
+    // Actual rendered glyph advance/line height (measured, not assumed) so the
+    // pointer maps to the correct character cell regardless of font size or
+    // letter-spacing.
+    let cellW = CELL_W;
+    let cellH = CELL_H;
 
     // Pointer position in grid coordinates (-1 means "no pointer").
     let pointerX = -1;
@@ -72,8 +77,31 @@ export default function AsciiWave({
       const rect = pre.getBoundingClientRect();
       width = rect.width;
       height = rect.height;
-      cols = Math.max(12, Math.floor(rect.width / CELL_W));
-      rows = Math.max(8, Math.floor(rect.height / CELL_H));
+
+      // Measure the true per-character advance using a probe that inherits the
+      // pre's font and letter-spacing. This keeps grid coordinates aligned with
+      // what's actually painted (fixes pointer drift on the x-axis).
+      const cs = getComputedStyle(pre);
+      const probe = document.createElement('span');
+      probe.style.position = 'absolute';
+      probe.style.visibility = 'hidden';
+      probe.style.whiteSpace = 'pre';
+      probe.style.fontFamily = cs.fontFamily;
+      probe.style.fontSize = cs.fontSize;
+      probe.style.fontWeight = cs.fontWeight;
+      probe.style.letterSpacing = cs.letterSpacing;
+      probe.style.lineHeight = cs.lineHeight;
+      const SAMPLE = 64;
+      probe.textContent = 'M'.repeat(SAMPLE);
+      pre.parentElement?.appendChild(probe);
+      const measuredW = probe.getBoundingClientRect().width / SAMPLE;
+      probe.remove();
+      cellW = measuredW > 0 ? measuredW : CELL_W;
+      const lh = parseFloat(cs.lineHeight);
+      cellH = Number.isFinite(lh) && lh > 0 ? lh : CELL_H;
+
+      cols = Math.max(12, Math.floor(width / cellW));
+      rows = Math.max(8, Math.floor(height / cellH));
     };
 
     const render = (time: number) => {
@@ -88,26 +116,24 @@ export default function AsciiWave({
         for (let x = 0; x < cols; x++) {
           let n = rainField(x, y, rows, time);
 
-          // Pointer interaction: a focused downpour that follows the cursor.
-          // A bright droplet at the pointer plus intensified streaks that fall
-          // downward in the same direction as the ambient rain, so the cursor
-          // feels like it's summoning heavier rain rather than disturbing it.
+          // Pointer interaction: a soft glowing halo that follows the cursor
+          // and makes the rain near it brighten/intensify, with slow expanding
+          // ripple rings for a calm, watery, "cool" feel. Aspect-corrected so
+          // the glow stays perfectly circular despite tall character cells.
           if (influence > 0.001 && pointerX >= 0) {
+            const aspect = cellH / cellW; // cells are taller than wide
             const dx = x - pointerX;
-            const dy = y - pointerY;
-            // Narrow vertical column of influence, slightly wider lower down.
-            const spread = 0.09 - Math.min(0, dy) * 0.01;
-            const horiz = Math.exp(-dx * dx * spread);
-            const t = time * 0.012;
-            // Heavier streaks beneath the cursor, moving downward with the rain.
-            if (dy >= -1) {
-              const fall = Math.sin(y * 0.85 - t * 6 + rand(x + 7) * 6.28);
-              const fade = Math.exp(-Math.max(0, dy) * 0.045);
-              n += horiz * fade * (0.4 + 0.45 * fall) * influence;
-            }
-            // Bright splash right at the cursor.
-            const core = Math.exp(-(dx * dx * 0.22 + dy * dy * 0.5));
-            n += core * influence * 0.75;
+            const dy = (y - pointerY) * aspect;
+            const dist = Math.sqrt(dx * dx + dy * dy);
+            const t = time * 0.0025;
+            // Core glow: brightens the field within ~10 cells of the cursor.
+            const glow = Math.exp(-(dist * dist) * 0.012);
+            // Expanding ripple rings that radiate outward and loop smoothly.
+            const ring =
+              Math.sin(dist * 0.7 - t * 6) *
+              Math.exp(-dist * 0.08) *
+              0.35;
+            n += (glow + ring) * influence;
           }
 
           const idx = Math.min(
