@@ -1,7 +1,5 @@
 import Link from "next/link";
 import ClickableTitle from "~/components/ClickableTitle";
-import AsciiWave from "~/components/AsciiWave";
-import CustomCursor from "~/components/CustomCursor";
 import { type Metadata } from "next";
 
 export const metadata: Metadata = {
@@ -31,16 +29,8 @@ const links = [
 
 export default function HomePage() {
   return (
-    <main className="relative flex min-h-[calc(100vh-9rem)] flex-col items-center justify-center overflow-hidden px-6 py-20 md:cursor-none">
-      <CustomCursor />
-
-      {/* Full-bleed interactive ASCII field as a living backdrop */}
-      <AsciiWave
-        className="absolute inset-0 h-full w-full text-[0.6rem] leading-[0.9rem] text-mocha-overlay-2 opacity-[0.32] [mask-image:radial-gradient(ellipse_65%_65%_at_50%_45%,black,transparent_88%)] sm:text-[0.72rem]"
-      />
-
-      {/* Content overlay */}
-      <div className="relative z-10 flex w-full max-w-lg flex-col items-center gap-7 text-center">
+    <main className="relative flex min-h-[calc(100vh-9rem)] flex-col items-center justify-center px-6 py-20">
+      <div className="flex w-full max-w-lg flex-col items-center gap-7 text-center">
         {/* Mono kicker with a soft live indicator */}
         <div className="flex items-center gap-2 font-mono text-xs uppercase tracking-[0.35em] text-mocha-overlay-2">
           <span className="relative flex h-1.5 w-1.5">

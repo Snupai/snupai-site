@@ -58,9 +58,10 @@ export default function AsciiWave({ className, interactive = true }: AsciiWavePr
       const cx = cols / 2;
       const cy = rows / 2;
 
-      // Ease the pointer influence toward its target (snappy in, gentle out).
+      // Ease the pointer influence toward its target. Gentle on both ends so
+      // the cursor's effect feels like a soft breath rather than a splash.
       const target = pointerX >= 0 ? 1 : 0;
-      influence += (target - influence) * 0.16;
+      influence += (target - influence) * 0.06;
 
       let out = '';
 
@@ -76,16 +77,16 @@ export default function AsciiWave({ className, interactive = true }: AsciiWavePr
             Math.sin((nx + ny) * 0.5 + t * 0.5) +
             Math.sin(dist * 1.6 - t * 1.2);
 
-          // Pointer ripple: a travelling wave radiating from the cursor.
-          // Wider reach and stronger amplitude so it reads clearly.
+          // Pointer interaction: a soft, slow swell near the cursor with a
+          // faint radiating ripple. Kept low-amplitude so it never overpowers
+          // the ambient waves — just a gentle intensity shift around the cursor.
           if (influence > 0.001 && pointerX >= 0) {
             const dx = (x - pointerX) * 0.16;
             const dy = (y - pointerY) * 0.28;
             const pd = Math.sqrt(dx * dx + dy * dy);
-            const ripple = Math.sin(pd * 2.0 - time * 0.008) * Math.exp(-pd * 0.18);
-            // A bright swell right under the cursor plus the radiating ripple.
-            const swell = Math.exp(-pd * pd * 0.5) * 2.2;
-            v += (ripple * 4.2 + swell) * influence;
+            const ripple = Math.sin(pd * 1.5 - time * 0.004) * Math.exp(-pd * 0.3);
+            const swell = Math.exp(-pd * pd * 0.6) * 0.8;
+            v += (ripple * 0.9 + swell) * influence;
           }
 
           // Map from [-4, 4]-ish to [0, 1].

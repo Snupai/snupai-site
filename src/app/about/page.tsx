@@ -1,4 +1,5 @@
 import { type Metadata } from "next";
+import PageHeader from "~/components/PageHeader";
 
 export const metadata: Metadata = {
   title: "About Snupai",
@@ -24,6 +25,16 @@ export const metadata: Metadata = {
 
 export const dynamic = "force-dynamic";
 
+const doing = [
+  "Programming",
+  "playing with AI",
+  "studying",
+  "sleeping",
+  "automation engineering",
+  "eating cookies :3",
+  "playing games",
+];
+
 export default function AboutPage() {
   const birthday = new Date(2002, 7, 30); // August 30, 2002 (month is 0-indexed)
   const today = new Date();
@@ -38,54 +49,61 @@ export default function AboutPage() {
 
   return (
     <main className="flex flex-col">
-      <div className="container mx-auto flex flex-col items-center justify-center gap-8 px-4 py-16">
-        <h1 className="text-5xl font-extrabold tracking-tight sm:text-[4rem]">
+      <div className="container mx-auto flex max-w-3xl flex-col gap-12 px-4 py-16 sm:py-20">
+        <PageHeader
+          kicker="about"
+          subtitle="Student, programmer, and automation engineer — coding for fun."
+        >
           About <span className="title-highlight">Snupai</span>
-        </h1>
+        </PageHeader>
 
-        <div className="max-w-3xl space-y-6 text-lg">
-          <p>
-            {
-              "Hi. I'm a student at University of Applied Sciences Kaiserslautern in Germany, actively studying applied computer science."
-            }
-          </p>
+        <p className="text-balance text-center text-lg leading-relaxed text-mocha-subtext">
+          {
+            "Hi. I'm a student at the University of Applied Sciences Kaiserslautern in Germany, studying applied computer science."
+          }
+        </p>
 
-          <div className="bg-mocha-surface space-y-4 rounded-xl p-6">
-            <h2 className="highlight-text text-2xl font-bold">So, who am I?</h2>
-            <p>
+        <div className="grid gap-5 sm:grid-cols-2">
+          <section className="rounded-2xl border border-mocha-surface bg-mocha-mantle/60 p-6 backdrop-blur-sm transition-colors hover:border-mocha-lavender sm:col-span-2">
+            <h2 className="mb-3 font-mono text-xs uppercase tracking-[0.25em] text-mocha-lavender">
+              So, who am I?
+            </h2>
+            <p className="leading-relaxed text-mocha-subtext">
               {`I am Snupai. I am ${age} years old. I code from time to time. `}
               {
-                "I'm a huge fan of AI and machine learning. I am a noob if it comes to programming but love playing around. "
+                "I'm a huge fan of AI and machine learning. I'm a noob when it comes to programming but love playing around. "
               }
-              {"My code is probably bad but I am having fun. "}
+              {"My code is probably bad but I'm having fun."}
             </p>
-          </div>
+          </section>
 
-          <div className="bg-mocha-surface space-y-4 rounded-xl p-6">
-            <h2 className="highlight-text text-2xl font-bold">What I do</h2>
-            <ul className="list-inside list-disc space-y-2">
-              <li>Programming</li>
-              <li>playing with AI</li>
-              <li>studying</li>
-              <li>sleeping</li>
-              <li>working as an automation engineer</li>
-              <li>eating cookies :3</li>
-              <li>playing games</li>
+          <section className="rounded-2xl border border-mocha-surface bg-mocha-mantle/60 p-6 backdrop-blur-sm transition-colors hover:border-mocha-lavender">
+            <h2 className="mb-4 font-mono text-xs uppercase tracking-[0.25em] text-mocha-lavender">
+              What I do
+            </h2>
+            <ul className="flex flex-wrap gap-2">
+              {doing.map((item) => (
+                <li
+                  key={item}
+                  className="rounded-full border border-mocha-surface bg-mocha-surface/40 px-3 py-1 text-sm text-mocha-subtext"
+                >
+                  {item}
+                </li>
+              ))}
             </ul>
-          </div>
+          </section>
 
-          <div className="bg-mocha-surface space-y-4 rounded-xl p-6">
-            <h2 className="highlight-text text-2xl font-bold">Fun Facts</h2>
-            <p>
+          <section className="rounded-2xl border border-mocha-surface bg-mocha-mantle/60 p-6 backdrop-blur-sm transition-colors hover:border-mocha-lavender">
+            <h2 className="mb-3 font-mono text-xs uppercase tracking-[0.25em] text-mocha-lavender">
+              Fun fact
+            </h2>
+            <p className="leading-relaxed text-mocha-subtext">
               {
-                "Snupai is a nickname I got from my friends. I am not sure why but it stuck. "
+                "Snupai is a nickname from my friends — not sure why, but it stuck. It's a mix of Snu Snu and Senpai. "
               }
-              {
-                "The name is a mix between Snu Snu and Senpai. Senpai is a Japanese word for older brother. "
-              }
-              {"While Snu Snu is... uh well... I won't explain it here. "}
+              {"Senpai is Japanese for an older student or mentor. Snu Snu is... well, I won't explain that one here."}
             </p>
-          </div>
+          </section>
         </div>
       </div>
     </main>
