@@ -47,7 +47,7 @@ export default function HomePage() {
 
         {/* One calm line */}
         <p className="max-w-sm text-balance text-base leading-relaxed text-mocha-subtext">
-          Hello. Welcome here.
+          I'm a student, programmer, and automation engineer. Here's where I share my projects and thoughts.
         </p>
 
         {/* Inline mono navigation */}
