@@ -14,7 +14,7 @@ export default function PrivacyPage() {
         </h1>
 
         <div className="w-full max-w-3xl space-y-6">
-          <div className="bg-mocha-surface space-y-4 rounded-xl p-6">
+          <div className="space-y-4 rounded-xl border border-mocha-surface bg-mocha-mantle/60 p-6 backdrop-blur-sm transition-colors hover:border-mocha-lavender">
             <h2 className="highlight-text text-2xl font-bold">
               Contact form processing
             </h2>
@@ -25,7 +25,7 @@ export default function PrivacyPage() {
             </p>
           </div>
 
-          <div className="bg-mocha-surface space-y-4 rounded-xl p-6">
+          <div className="space-y-4 rounded-xl border border-mocha-surface bg-mocha-mantle/60 p-6 backdrop-blur-sm transition-colors hover:border-mocha-lavender">
             <h2 className="highlight-text text-2xl font-bold">
               Stored metadata
             </h2>
@@ -37,7 +37,7 @@ export default function PrivacyPage() {
             </p>
           </div>
 
-          <div className="bg-mocha-surface space-y-4 rounded-xl p-6">
+          <div className="space-y-4 rounded-xl border border-mocha-surface bg-mocha-mantle/60 p-6 backdrop-blur-sm transition-colors hover:border-mocha-lavender">
             <h2 className="highlight-text text-2xl font-bold">
               Purpose and retention
             </h2>
@@ -50,7 +50,7 @@ export default function PrivacyPage() {
             </p>
           </div>
 
-          <div className="bg-mocha-surface space-y-4 rounded-xl p-6">
+          <div className="space-y-4 rounded-xl border border-mocha-surface bg-mocha-mantle/60 p-6 backdrop-blur-sm transition-colors hover:border-mocha-lavender">
             <h2 className="highlight-text text-2xl font-bold">
               Email delivery
             </h2>
