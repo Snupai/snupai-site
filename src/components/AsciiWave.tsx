@@ -88,17 +88,21 @@ export default function AsciiWave({
         for (let x = 0; x < cols; x++) {
           let n = rainField(x, y, rows, time);
 
-          // Pointer interaction: a soft, slow swell near the cursor with a
-          // faint radiating ripple, kept low-amplitude so it never overpowers
-          // the ambient pattern.
+          // Pointer interaction: raindrop-on-water. Concentric rings expand
+          // outward from the cursor while a soft droplet core gently sparkles,
+          // kept low-amplitude so it complements the ambient rain rather than
+          // overpowering it.
           if (influence > 0.001 && pointerX >= 0) {
             const dx = (x - pointerX) * 0.16;
             const dy = (y - pointerY) * 0.28;
             const pd = Math.sqrt(dx * dx + dy * dy);
-            const ripple =
-              Math.sin(pd * 1.5 - time * 0.004) * Math.exp(-pd * 0.3);
-            const swell = Math.exp(-pd * pd * 0.6) * 0.8;
-            n += (ripple * 0.9 + swell) * influence * 0.5;
+            const t = time * 0.005;
+            // Outward-traveling ripple rings that fade with distance.
+            const rings = Math.sin(pd * 2.4 - t * 2.4) * Math.exp(-pd * 0.45);
+            // Bright droplet core that softly breathes/sparkles.
+            const swell =
+              Math.exp(-pd * pd * 0.5) * (0.7 + 0.3 * Math.sin(t * 3.2));
+            n += (rings * 0.7 + swell) * influence * 0.6;
           }
 
           const idx = Math.min(

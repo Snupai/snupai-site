@@ -14,7 +14,7 @@ export default function SiteBackground() {
       aria-hidden="true"
       className="pointer-events-none fixed inset-0 -z-10 flex items-center justify-center"
     >
-      <AsciiWave className="h-full w-full text-[0.6rem] leading-[0.9rem] text-mocha-lavender opacity-[0.38] [mask-image:radial-gradient(ellipse_75%_75%_at_50%_45%,black,transparent_92%)] sm:text-[0.72rem]" />
+      <AsciiWave className="h-full w-full text-[0.6rem] leading-[0.9rem] text-mocha-sapphire opacity-[0.38] [filter:drop-shadow(0_0_6px_rgba(137,220,235,0.35))] [mask-image:radial-gradient(ellipse_75%_75%_at_50%_45%,black,transparent_92%)] sm:text-[0.72rem]" />
     </div>
   );
 }
