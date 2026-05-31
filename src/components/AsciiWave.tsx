@@ -88,21 +88,26 @@ export default function AsciiWave({
         for (let x = 0; x < cols; x++) {
           let n = rainField(x, y, rows, time);
 
-          // Pointer interaction: raindrop-on-water. Concentric rings expand
-          // outward from the cursor while a soft droplet core gently sparkles,
-          // kept low-amplitude so it complements the ambient rain rather than
-          // overpowering it.
+          // Pointer interaction: a focused downpour that follows the cursor.
+          // A bright droplet at the pointer plus intensified streaks that fall
+          // downward in the same direction as the ambient rain, so the cursor
+          // feels like it's summoning heavier rain rather than disturbing it.
           if (influence > 0.001 && pointerX >= 0) {
-            const dx = (x - pointerX) * 0.16;
-            const dy = (y - pointerY) * 0.28;
-            const pd = Math.sqrt(dx * dx + dy * dy);
-            const t = time * 0.005;
-            // Outward-traveling ripple rings that fade with distance.
-            const rings = Math.sin(pd * 2.4 - t * 2.4) * Math.exp(-pd * 0.45);
-            // Bright droplet core that softly breathes/sparkles.
-            const swell =
-              Math.exp(-pd * pd * 0.5) * (0.7 + 0.3 * Math.sin(t * 3.2));
-            n += (rings * 0.7 + swell) * influence * 0.6;
+            const dx = x - pointerX;
+            const dy = y - pointerY;
+            // Narrow vertical column of influence, slightly wider lower down.
+            const spread = 0.09 - Math.min(0, dy) * 0.01;
+            const horiz = Math.exp(-dx * dx * spread);
+            const t = time * 0.012;
+            // Heavier streaks beneath the cursor, moving downward with the rain.
+            if (dy >= -1) {
+              const fall = Math.sin(y * 0.85 - t * 6 + rand(x + 7) * 6.28);
+              const fade = Math.exp(-Math.max(0, dy) * 0.045);
+              n += horiz * fade * (0.4 + 0.45 * fall) * influence;
+            }
+            // Bright splash right at the cursor.
+            const core = Math.exp(-(dx * dx * 0.22 + dy * dy * 0.5));
+            n += core * influence * 0.75;
           }
 
           const idx = Math.min(
