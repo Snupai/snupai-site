@@ -116,24 +116,18 @@ export default function AsciiWave({
         for (let x = 0; x < cols; x++) {
           let n = rainField(x, y, rows, time);
 
-          // Pointer interaction: a soft glowing halo that follows the cursor
-          // and makes the rain near it brighten/intensify, with slow expanding
-          // ripple rings for a calm, watery, "cool" feel. Aspect-corrected so
-          // the glow stays perfectly circular despite tall character cells.
+          // Pointer interaction: a barely-there glow that very gently lifts
+          // the rain in the few cells immediately around the cursor. Tiny
+          // radius and low amplitude keep it whisper-subtle; aspect-corrected
+          // so it stays circular despite tall character cells.
           if (influence > 0.001 && pointerX >= 0) {
             const aspect = cellH / cellW; // cells are taller than wide
             const dx = x - pointerX;
             const dy = (y - pointerY) * aspect;
-            const dist = Math.sqrt(dx * dx + dy * dy);
-            const t = time * 0.0025;
-            // Core glow: brightens the field within ~10 cells of the cursor.
-            const glow = Math.exp(-(dist * dist) * 0.012);
-            // Expanding ripple rings that radiate outward and loop smoothly.
-            const ring =
-              Math.sin(dist * 0.7 - t * 6) *
-              Math.exp(-dist * 0.08) *
-              0.35;
-            n += (glow + ring) * influence;
+            const dist2 = dx * dx + dy * dy;
+            // Small, soft glow confined to within ~3 cells of the cursor.
+            const glow = Math.exp(-dist2 * 0.09);
+            n += glow * influence * 0.18;
           }
 
           const idx = Math.min(
