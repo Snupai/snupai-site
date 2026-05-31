@@ -1,3 +1,5 @@
+import AsciiSwitcher from "~/components/AsciiSwitcher";
+
 export default function Footer() {
   return (
     <footer className="fixed bottom-0 left-0 right-0 h-12 z-50">
@@ -14,6 +16,9 @@ export default function Footer() {
             <a href="/imprint" className="underline hover:text-mocha-pink transition-colors">Imprint</a>
             <a href="/privacy" className="underline hover:text-mocha-pink transition-colors">Privacy</a>
           </div>
+        </div>
+        <div className="absolute right-3 top-1/2 -translate-y-1/2">
+          <AsciiSwitcher />
         </div>
       </div>
     </footer>

@@ -1,6 +1,11 @@
 'use client';
 
 import { useEffect, useRef } from 'react';
+import {
+  DEFAULT_VARIANT,
+  FIELD_FNS,
+  type AsciiVariant,
+} from '~/components/ascii/variants';
 
 // Density ramp from "empty" to "dense". Calm, soft gradient of characters.
 const RAMP = ' ·.:-=+*#%@';
@@ -9,23 +14,33 @@ interface AsciiWaveProps {
   className?: string;
   /** Multiplier for how strongly the pointer disturbs the field. */
   interactive?: boolean;
+  /** Which ASCII field pattern to render. */
+  variant?: AsciiVariant;
 }
 
 /**
- * A calm, interactive ASCII wave-field.
+ * A calm, interactive ASCII field renderer.
  *
- * A grid of monospace glyphs whose density is driven by a few overlapping
- * sine waves, producing slow, meditative ripples. The pointer adds a soft
- * radial swell that follows the cursor, so the field feels alive without
- * being noisy. The grid adapts to its container, throttles to a low frame
- * rate, pauses off-screen, and respects prefers-reduced-motion.
+ * A grid of monospace glyphs whose density is driven by a swappable field
+ * function (see `ascii/variants`). The pointer adds a soft radial swell that
+ * follows the cursor, so the field feels alive without being noisy. The grid
+ * adapts to its container, throttles to a low frame rate, pauses off-screen,
+ * and respects prefers-reduced-motion. Switching variants simply swaps the
+ * field function while reusing the exact same harness, so every option stays
+ * lightweight and never shifts layout.
  */
-export default function AsciiWave({ className, interactive = true }: AsciiWaveProps) {
+export default function AsciiWave({
+  className,
+  interactive = true,
+  variant = DEFAULT_VARIANT,
+}: AsciiWaveProps) {
   const preRef = useRef<HTMLPreElement>(null);
 
   useEffect(() => {
     const pre = preRef.current;
     if (!pre) return;
+
+    const field = FIELD_FNS[variant] ?? FIELD_FNS[DEFAULT_VARIANT];
 
     const prefersReducedMotion = window.matchMedia(
       '(prefers-reduced-motion: reduce)',
@@ -54,10 +69,6 @@ export default function AsciiWave({ className, interactive = true }: AsciiWavePr
     };
 
     const render = (time: number) => {
-      const t = time * 0.0004;
-      const cx = cols / 2;
-      const cy = rows / 2;
-
       // Ease the pointer influence toward its target. Gentle on both ends so
       // the cursor's effect feels like a soft breath rather than a splash.
       const target = pointerX >= 0 ? 1 : 0;
@@ -67,30 +78,21 @@ export default function AsciiWave({ className, interactive = true }: AsciiWavePr
 
       for (let y = 0; y < rows; y++) {
         for (let x = 0; x < cols; x++) {
-          const nx = (x - cx) * 0.18;
-          const ny = (y - cy) * 0.32;
-          const dist = Math.sqrt(nx * nx + ny * ny);
-
-          let v =
-            Math.sin(nx + t) +
-            Math.sin(ny * 0.8 - t * 0.7) +
-            Math.sin((nx + ny) * 0.5 + t * 0.5) +
-            Math.sin(dist * 1.6 - t * 1.2);
+          let n = field(x, y, { cols, rows, time });
 
           // Pointer interaction: a soft, slow swell near the cursor with a
-          // faint radiating ripple. Kept low-amplitude so it never overpowers
-          // the ambient waves, just a gentle intensity shift around the cursor.
+          // faint radiating ripple. Applied uniformly across every variant and
+          // kept low-amplitude so it never overpowers the ambient pattern.
           if (influence > 0.001 && pointerX >= 0) {
             const dx = (x - pointerX) * 0.16;
             const dy = (y - pointerY) * 0.28;
             const pd = Math.sqrt(dx * dx + dy * dy);
-            const ripple = Math.sin(pd * 1.5 - time * 0.004) * Math.exp(-pd * 0.3);
+            const ripple =
+              Math.sin(pd * 1.5 - time * 0.004) * Math.exp(-pd * 0.3);
             const swell = Math.exp(-pd * pd * 0.6) * 0.8;
-            v += (ripple * 0.9 + swell) * influence;
+            n += (ripple * 0.9 + swell) * influence * 0.5;
           }
 
-          // Map from [-4, 4]-ish to [0, 1].
-          const n = (v + 4) / 8;
           const idx = Math.min(
             RAMP.length - 1,
             Math.max(0, Math.floor(n * (RAMP.length - 1))),
@@ -175,7 +177,7 @@ export default function AsciiWave({ className, interactive = true }: AsciiWavePr
       window.removeEventListener('pointerdown', onPointerMove);
       document.removeEventListener('pointerleave', onPointerLeave);
     };
-  }, [interactive]);
+  }, [interactive, variant]);
 
   return (
     <pre
