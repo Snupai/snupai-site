@@ -58,9 +58,9 @@ export default function AsciiWave({ className, interactive = true }: AsciiWavePr
       const cx = cols / 2;
       const cy = rows / 2;
 
-      // Ease the pointer influence toward its target.
+      // Ease the pointer influence toward its target (snappy in, gentle out).
       const target = pointerX >= 0 ? 1 : 0;
-      influence += (target - influence) * 0.08;
+      influence += (target - influence) * 0.16;
 
       let out = '';
 
@@ -77,12 +77,15 @@ export default function AsciiWave({ className, interactive = true }: AsciiWavePr
             Math.sin(dist * 1.6 - t * 1.2);
 
           // Pointer ripple: a travelling wave radiating from the cursor.
+          // Wider reach and stronger amplitude so it reads clearly.
           if (influence > 0.001 && pointerX >= 0) {
-            const dx = (x - pointerX) * 0.18;
-            const dy = (y - pointerY) * 0.32;
+            const dx = (x - pointerX) * 0.16;
+            const dy = (y - pointerY) * 0.28;
             const pd = Math.sqrt(dx * dx + dy * dy);
-            const ripple = Math.sin(pd * 2.2 - time * 0.006) * Math.exp(-pd * 0.35);
-            v += ripple * 2.6 * influence;
+            const ripple = Math.sin(pd * 2.0 - time * 0.008) * Math.exp(-pd * 0.18);
+            // A bright swell right under the cursor plus the radiating ripple.
+            const swell = Math.exp(-pd * pd * 0.5) * 2.2;
+            v += (ripple * 4.2 + swell) * influence;
           }
 
           // Map from [-4, 4]-ish to [0, 1].
@@ -102,7 +105,7 @@ export default function AsciiWave({ className, interactive = true }: AsciiWavePr
     let frameId = 0;
     let lastFrame = 0;
     let running = true;
-    const FRAME_INTERVAL = 1000 / 20; // ~20fps, calm but responsive to pointer
+    const FRAME_INTERVAL = 1000 / 30; // ~30fps, smooth and responsive to pointer
 
     const loop = (time: number) => {
       if (!running) return;

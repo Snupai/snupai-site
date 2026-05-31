@@ -245,3 +245,41 @@
     color: var(--lavender);
   }
 }
+
+/* ---- Custom cursor ---- */
+.cursor-none-root,
+.cursor-none-root a,
+.cursor-none-root button {
+  cursor: none;
+}
+
+.cursor-dot {
+  background-color: var(--lavender);
+  box-shadow:
+    0 0 6px rgba(180, 190, 254, 0.9),
+    0 0 14px rgba(180, 190, 254, 0.55);
+  transition: opacity 0.2s ease;
+}
+
+.cursor-ring {
+  box-shadow:
+    0 0 10px rgba(180, 190, 254, 0.45),
+    inset 0 0 6px rgba(180, 190, 254, 0.25);
+}
+
+.cursor-pulse-run {
+  animation: cursor-pulse 0.55s ease-out forwards;
+}
+
+@keyframes cursor-pulse {
+  0% {
+    opacity: 0.8;
+    width: 0.75rem;
+    height: 0.75rem;
+  }
+  100% {
+    opacity: 0;
+    width: 4.5rem;
+    height: 4.5rem;
+  }
+}

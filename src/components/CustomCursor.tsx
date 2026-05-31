@@ -3,17 +3,19 @@
 import { useEffect, useRef, useState } from 'react';
 
 /**
- * A subtle custom cursor for the home page.
+ * A bold, glowing custom cursor for the home page.
  *
- * - A small solid dot tracks the pointer exactly.
- * - A larger ring trails behind with easing for a calm, fluid feel.
- * - The ring grows and brightens when hovering interactive elements.
+ * - A bright dot tracks the pointer exactly.
+ * - A larger ring trails behind with noticeable easing for a fluid feel.
+ * - The ring grows and turns pink when hovering interactive elements.
+ * - Clicking emits a quick expanding pulse.
  *
  * Disabled on touch devices and when the user prefers reduced motion.
  */
 export default function CustomCursor() {
   const ringRef = useRef<HTMLDivElement>(null);
   const dotRef = useRef<HTMLDivElement>(null);
+  const pulseRef = useRef<HTMLDivElement>(null);
   const [enabled, setEnabled] = useState(false);
 
   useEffect(() => {
@@ -24,10 +26,12 @@ export default function CustomCursor() {
 
     if (prefersReducedMotion || !isFinePointer) return;
     setEnabled(true);
+    document.documentElement.classList.add('cursor-none-root');
 
     const ring = ringRef.current;
     const dot = dotRef.current;
-    if (!ring || !dot) return;
+    const pulse = pulseRef.current;
+    if (!ring || !dot || !pulse) return;
 
     let mouseX = window.innerWidth / 2;
     let mouseY = window.innerHeight / 2;
@@ -62,20 +66,33 @@ export default function CustomCursor() {
       dot.style.opacity = '0';
     };
 
+    const onDown = (e: PointerEvent) => {
+      // Restart the pulse animation at the click point.
+      pulse.style.transform = `translate3d(${e.clientX}px, ${e.clientY}px, 0) translate(-50%, -50%)`;
+      pulse.classList.remove('cursor-pulse-run');
+      // Force reflow so the animation can replay.
+      void pulse.offsetWidth;
+      pulse.classList.add('cursor-pulse-run');
+    };
+
     let frameId = 0;
     const loop = () => {
-      ringX += (mouseX - ringX) * 0.18;
-      ringY += (mouseY - ringY) * 0.18;
+      // Lower factor => more lag => a clearly visible trailing motion.
+      ringX += (mouseX - ringX) * 0.12;
+      ringY += (mouseY - ringY) * 0.12;
       ring.style.transform = `translate3d(${ringX}px, ${ringY}px, 0) translate(-50%, -50%)`;
       frameId = requestAnimationFrame(loop);
     };
 
     window.addEventListener('pointermove', onMove, { passive: true });
+    window.addEventListener('pointerdown', onDown, { passive: true });
     document.addEventListener('pointerleave', onLeave);
     frameId = requestAnimationFrame(loop);
 
     return () => {
+      document.documentElement.classList.remove('cursor-none-root');
       window.removeEventListener('pointermove', onMove);
+      window.removeEventListener('pointerdown', onDown);
       document.removeEventListener('pointerleave', onLeave);
       cancelAnimationFrame(frameId);
     };
@@ -84,15 +101,22 @@ export default function CustomCursor() {
   if (!enabled) return null;
 
   return (
-    <div aria-hidden="true" className="pointer-events-none fixed inset-0 z-50 hidden md:block">
+    <div aria-hidden="true" className="pointer-events-none fixed inset-0 z-[60] hidden md:block">
+      {/* Trailing ring */}
       <div
         ref={ringRef}
         data-hover="false"
-        className="absolute left-0 top-0 h-8 w-8 rounded-full border border-mocha-lavender opacity-0 transition-[width,height,background-color,border-color,opacity] duration-200 ease-out data-[hover=true]:h-12 data-[hover=true]:w-12 data-[hover=true]:border-mocha-pink data-[hover=true]:bg-mocha-lavender-soft"
+        className="cursor-ring absolute left-0 top-0 h-9 w-9 rounded-full border-2 border-mocha-lavender opacity-0 transition-[width,height,border-color,background-color] duration-200 ease-out data-[hover=true]:h-14 data-[hover=true]:w-14 data-[hover=true]:border-mocha-pink data-[hover=true]:bg-mocha-lavender-soft"
       />
+      {/* Exact-tracking dot */}
       <div
         ref={dotRef}
-        className="absolute left-0 top-0 h-1.5 w-1.5 rounded-full bg-mocha-lavender opacity-0 transition-opacity duration-200"
+        className="cursor-dot absolute left-0 top-0 h-2.5 w-2.5 rounded-full bg-mocha-lavender opacity-0"
+      />
+      {/* Click pulse */}
+      <div
+        ref={pulseRef}
+        className="absolute left-0 top-0 h-9 w-9 rounded-full border-2 border-mocha-pink opacity-0"
       />
     </div>
   );

@@ -36,7 +36,7 @@ export default function HomePage() {
 
       {/* Full-bleed interactive ASCII field as a living backdrop */}
       <AsciiWave
-        className="absolute inset-0 h-full w-full text-[0.6rem] leading-[0.9rem] text-mocha-overlay-1 opacity-[0.22] [mask-image:radial-gradient(ellipse_60%_60%_at_50%_45%,black,transparent_85%)] sm:text-[0.72rem]"
+        className="absolute inset-0 h-full w-full text-[0.6rem] leading-[0.9rem] text-mocha-overlay-2 opacity-[0.32] [mask-image:radial-gradient(ellipse_65%_65%_at_50%_45%,black,transparent_88%)] sm:text-[0.72rem]"
       />
 
       {/* Content overlay */}
