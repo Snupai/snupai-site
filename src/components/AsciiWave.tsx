@@ -1,46 +1,54 @@
 'use client';
 
 import { useEffect, useRef } from 'react';
-import {
-  DEFAULT_VARIANT,
-  FIELD_FNS,
-  type AsciiVariant,
-} from '~/components/ascii/variants';
 
 // Density ramp from "empty" to "dense". Calm, soft gradient of characters.
 const RAMP = ' ·.:-=+*#%@';
+
+const fract = (n: number) => n - Math.floor(n);
+// Cheap deterministic per-column pseudo-randomness (no allocations).
+const rand = (n: number) => fract(Math.sin(n * 127.1) * 43758.5453);
+
+/**
+ * Soft matrix-style rain field: per-column drops falling at varied speeds.
+ * Maps a grid cell + time to a density value in roughly [0, 1].
+ */
+function rainField(x: number, y: number, rows: number, time: number) {
+  const t = time * 0.004;
+  const seed = rand(x + 1);
+  const speed = 3 + seed * 7;
+  const span = rows + 12;
+  const head = (t * speed + seed * span) % span;
+  const rel = head - y; // > 0 => cell is in the trailing tail above the head
+  if (rel < -1) return 0;
+  if (rel < 0) return 0.95; // bright leading head
+  return Math.max(0, 0.85 - rel * 0.12); // fading tail
+}
 
 interface AsciiWaveProps {
   className?: string;
   /** Multiplier for how strongly the pointer disturbs the field. */
   interactive?: boolean;
-  /** Which ASCII field pattern to render. */
-  variant?: AsciiVariant;
 }
 
 /**
- * A calm, interactive ASCII field renderer.
+ * A calm, interactive ASCII rain renderer.
  *
- * A grid of monospace glyphs whose density is driven by a swappable field
- * function (see `ascii/variants`). The pointer adds a soft radial swell that
- * follows the cursor, so the field feels alive without being noisy. The grid
- * adapts to its container, throttles to a low frame rate, pauses off-screen,
- * and respects prefers-reduced-motion. Switching variants simply swaps the
- * field function while reusing the exact same harness, so every option stays
- * lightweight and never shifts layout.
+ * A grid of monospace glyphs whose density is driven by a soft matrix-rain
+ * field. The pointer adds a soft radial swell that follows the cursor, so the
+ * field feels alive without being noisy. The grid adapts to its container,
+ * throttles to a low frame rate, pauses off-screen, respects
+ * prefers-reduced-motion, and never causes layout shift.
  */
 export default function AsciiWave({
   className,
   interactive = true,
-  variant = DEFAULT_VARIANT,
 }: AsciiWaveProps) {
   const preRef = useRef<HTMLPreElement>(null);
 
   useEffect(() => {
     const pre = preRef.current;
     if (!pre) return;
-
-    const field = FIELD_FNS[variant] ?? FIELD_FNS[DEFAULT_VARIANT];
 
     const prefersReducedMotion = window.matchMedia(
       '(prefers-reduced-motion: reduce)',
@@ -78,11 +86,11 @@ export default function AsciiWave({
 
       for (let y = 0; y < rows; y++) {
         for (let x = 0; x < cols; x++) {
-          let n = field(x, y, { cols, rows, time });
+          let n = rainField(x, y, rows, time);
 
           // Pointer interaction: a soft, slow swell near the cursor with a
-          // faint radiating ripple. Applied uniformly across every variant and
-          // kept low-amplitude so it never overpowers the ambient pattern.
+          // faint radiating ripple, kept low-amplitude so it never overpowers
+          // the ambient pattern.
           if (influence > 0.001 && pointerX >= 0) {
             const dx = (x - pointerX) * 0.16;
             const dy = (y - pointerY) * 0.28;
@@ -177,7 +185,7 @@ export default function AsciiWave({
       window.removeEventListener('pointerdown', onPointerMove);
       document.removeEventListener('pointerleave', onPointerLeave);
     };
-  }, [interactive, variant]);
+  }, [interactive]);
 
   return (
     <pre
