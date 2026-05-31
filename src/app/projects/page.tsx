@@ -34,14 +34,14 @@ export default async function ProjectsPage() {
           My <span className="title-highlight">Projects</span>
         </PageHeader>
 
-        <section className="flex flex-col gap-6">
+        <section className="mx-auto w-full max-w-5xl flex flex-col gap-6">
           <span className="font-mono text-xs uppercase tracking-[0.25em] text-mocha-lavender">
             built by me
           </span>
           <ProjectList initialRepos={owned} />
         </section>
 
-        <section className="flex flex-col gap-6">
+        <section className="mx-auto w-full max-w-5xl flex flex-col gap-6">
           <span className="font-mono text-xs uppercase tracking-[0.25em] text-mocha-lavender">
             love &amp; recommend
           </span>
