@@ -47,7 +47,7 @@ export default function HomePage() {
 
         {/* One calm line */}
         <p className="max-w-sm text-balance text-base leading-relaxed text-mocha-subtext">
-          A quiet corner of the internet. Move your cursor — the waves follow.
+          Hello. Welcome here.
         </p>
 
         {/* Inline mono navigation */}
