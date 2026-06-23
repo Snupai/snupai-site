@@ -18,7 +18,13 @@ type Repo = {
   };
 };
 
-export default function ProjectList({ initialRepos }: { initialRepos: Repo[] }) {
+export default function ProjectList({
+  initialRepos,
+  label,
+}: {
+  initialRepos: Repo[];
+  label: string;
+}) {
   const [sortBy, setSortBy] = useState('lastCommit');
   const [mounted, setMounted] = useState(false);
   const itemRefs = useRef<Map<string, HTMLElement>>(new Map());
@@ -74,10 +80,13 @@ export default function ProjectList({ initialRepos }: { initialRepos: Repo[] }) 
 
   return (
     <div className="mx-auto flex w-full max-w-5xl flex-col gap-4">
-      <div className="flex justify-end gap-4">
-        <div className="relative">
+      <div className="flex items-center justify-between gap-3 sm:gap-4">
+        <span className="min-w-0 truncate font-mono text-[0.65rem] uppercase tracking-[0.18em] text-mocha-lavender sm:text-xs sm:tracking-[0.25em]">
+          {label}
+        </span>
+        <div className="relative flex-shrink-0">
           <select 
-            className="border border-mocha-surface bg-transparent px-4 py-2 pr-10 rounded-lg text-mocha-text appearance-none backdrop-blur-sm transition-colors hover:border-mocha-lavender"
+            className="w-44 appearance-none rounded-lg border border-mocha-surface bg-transparent px-3 py-2 pr-9 text-sm text-mocha-text backdrop-blur-sm transition-colors hover:border-mocha-lavender sm:w-auto sm:px-4 sm:pr-10 sm:text-base"
             value={sortBy}
             onChange={(e) => setSortBy(e.target.value)}
           >

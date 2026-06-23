@@ -40,17 +40,11 @@ export default async function ProjectsPage() {
         </PageHeader>
 
         <section className="mx-auto w-full max-w-5xl flex flex-col gap-6">
-          <span className="font-mono text-xs uppercase tracking-[0.25em] text-mocha-lavender">
-            built by me
-          </span>
-          <ProjectList initialRepos={owned} />
+          <ProjectList initialRepos={owned} label="built by me" />
         </section>
 
         <section className="mx-auto w-full max-w-5xl flex flex-col gap-6">
-          <span className="font-mono text-xs uppercase tracking-[0.25em] text-mocha-lavender">
-            love &amp; recommend
-          </span>
-          <ProjectList initialRepos={shoutout} />
+          <ProjectList initialRepos={shoutout} label="love & recommend" />
         </section>
       </div>
     </main>
