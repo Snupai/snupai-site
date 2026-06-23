@@ -2,19 +2,25 @@ import nodemailer from "nodemailer";
 import { env } from "~/env";
 import type { ContactSubmissionRecord } from "~/server/contact/types";
 
-const transporter = nodemailer.createTransport({
-  host: env.SMTP_HOST,
-  port: env.SMTP_PORT,
-  secure: false,
-  auth: {
-    user: env.SMTP_USER,
-    pass: env.SMTP_PASS,
-  },
-  tls: {
-    rejectUnauthorized: false,
-    minVersion: "TLSv1.2",
-  },
-});
+let transporter: ReturnType<typeof nodemailer.createTransport> | null = null;
+
+function getTransporter() {
+  transporter ??= nodemailer.createTransport({
+    host: env.SMTP_HOST,
+    port: env.SMTP_PORT,
+    secure: false,
+    auth: {
+      user: env.SMTP_USER,
+      pass: env.SMTP_PASS,
+    },
+    tls: {
+      rejectUnauthorized: false,
+      minVersion: "TLSv1.2",
+    },
+  });
+
+  return transporter;
+}
 
 function escapeHtml(value: string) {
   return value
@@ -35,7 +41,7 @@ export async function sendContactSubmissionEmail(record: ContactSubmissionRecord
   const safeCountry = escapeHtml(record.country ?? "unknown");
   const safeReviewUrl = escapeHtml(adminReviewUrl);
 
-  await transporter.sendMail({
+  await getTransporter().sendMail({
     from: `"Contact Form" <${env.SMTP_USER}>`,
     to: env.SMTP_TO_ADDRESS,
     replyTo: record.email,

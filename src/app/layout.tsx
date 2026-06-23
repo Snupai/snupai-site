@@ -10,11 +10,29 @@ import SiteBackground from "~/components/SiteBackground";
 export const metadata: Metadata = {
   metadataBase: new URL("https://snupai.me"),
   title: {
-    default: "Snupai's Website",
-    template: "%s | Snupai's Website",
+    default: "snupai.me - probably coding, definitely meowing",
+    template: "%s | snupai.me",
   },
-  description: "Personal website of Snupai - Student, Programmer, and Automation Engineer",
-  icons: [{ rel: "icon", url: "/snupai.ico" }],
+  description:
+    "Snupai's personal site with code projects, AI experiments, automation ideas, social links, yuri vibes, and suspicious amounts of meow.",
+  icons: {
+    icon: [{ url: "/snupai.ico" }],
+    apple: [
+      {
+        url: "/apple-touch-icon.png",
+        sizes: "180x180",
+        type: "image/png",
+      },
+    ],
+    other: [
+      {
+        rel: "apple-touch-icon-precomposed",
+        url: "/touch-icon-310x310.png",
+        sizes: "310x310",
+        type: "image/png",
+      },
+    ],
+  },
 };
 
 export default function RootLayout({

@@ -1,6 +1,6 @@
 import { randomUUID } from "node:crypto";
 import { z } from "zod";
-import { redis } from "~/server/redis";
+import { getRedis } from "~/server/redis";
 import { resolveManagedProject, validateGitHubRepo } from "~/server/projects/github";
 import type { ManagedProjectRecord, ManagedProjectSection } from "~/server/projects/types";
 
@@ -30,9 +30,32 @@ const defaultProjects: Array<Pick<ManagedProjectRecord, "repoPath" | "section" |
   { repoPath: "Aiko-IT-Systems/DisCatSharp", section: "shoutout", descriptionOverride: "Your library to write discord apps in C# with focus on always providing access to the latest discord features." },
 ];
 const DEFAULT_OWNED_PROJECT_COUNT = defaultProjects.filter((project) => project.section === "owned").length;
+const DEFAULT_PROJECT_CREATED_AT = "2024-01-01T00:00:00.000Z";
 
 function getProjectKey(id: string) {
   return `project:${id}`;
+}
+
+function getDefaultProjectSortOrder(
+  project: Pick<ManagedProjectRecord, "section">,
+  index: number,
+) {
+  return project.section === "owned" ? index : index - DEFAULT_OWNED_PROJECT_COUNT;
+}
+
+function getDefaultManagedProjectRecords(): ManagedProjectRecord[] {
+  return defaultProjects.map((project, index) => ({
+    id: `default-${project.repoPath.toLowerCase().replace(/[^a-z0-9]+/g, "-")}`,
+    repoPath: project.repoPath,
+    section: project.section,
+    descriptionOverride: project.descriptionOverride,
+    sortOrder: getDefaultProjectSortOrder(project, index),
+    isVisible: true,
+    createdAt: DEFAULT_PROJECT_CREATED_AT,
+    updatedAt: DEFAULT_PROJECT_CREATED_AT,
+    homepageOverride: null,
+    titleOverride: null,
+  }));
 }
 
 function sortProjects(projects: ManagedProjectRecord[]) {
@@ -60,14 +83,17 @@ function normalizeOptionalText(value: string | null | undefined) {
 }
 
 async function getProjectIds() {
+  const redis = getRedis();
   return await redis.smembers<string[]>(PROJECT_IDS_KEY);
 }
 
 async function getProjectById(id: string) {
+  const redis = getRedis();
   return await redis.get<ManagedProjectRecord>(getProjectKey(id));
 }
 
 async function putProject(record: ManagedProjectRecord) {
+  const redis = getRedis();
   await redis.set(getProjectKey(record.id), record);
   await redis.sadd(PROJECT_IDS_KEY, record.id);
 }
@@ -85,7 +111,7 @@ export async function ensureManagedProjectsSeeded() {
       repoPath: project.repoPath,
       section: project.section,
       descriptionOverride: project.descriptionOverride,
-      sortOrder: project.section === "owned" ? index : index - DEFAULT_OWNED_PROJECT_COUNT,
+      sortOrder: getDefaultProjectSortOrder(project, index),
       isVisible: true,
       createdAt,
       updatedAt: createdAt,
@@ -180,6 +206,7 @@ export async function deleteManagedProject(id: string) {
     return false;
   }
 
+  const redis = getRedis();
   await redis.del(getProjectKey(id));
   await redis.srem(PROJECT_IDS_KEY, id);
   return true;
@@ -223,7 +250,7 @@ export async function reorderManagedProjects(input: {
 }
 
 export async function listResolvedProjectsForPublic() {
-  const managedProjects = await listManagedProjects();
+  const managedProjects = await listManagedProjects().catch(() => getDefaultManagedProjectRecords());
   const visibleProjects = managedProjects.filter((project) => project.isVisible);
   const resolved = await Promise.all(visibleProjects.map((project) => resolveManagedProject(project, 3600)));
 

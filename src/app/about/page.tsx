@@ -1,14 +1,15 @@
 import { type Metadata } from "next";
 import PageHeader from "~/components/PageHeader";
 
+const description =
+  "About Snupai: a German applied computer science student who codes for fun, experiments with AI, and builds small automation projects.";
+
 export const metadata: Metadata = {
   title: "About Snupai",
-  description:
-    "Learn more about me - a student, programmer, and automation engineer.",
+  description,
   openGraph: {
     title: "About Snupai",
-    description:
-      "Learn more about me - a student, programmer, and automation engineer.",
+    description,
     url: "https://snupai.me/about",
     siteName: "Snupai's Website",
     locale: "en_US",
@@ -17,8 +18,7 @@ export const metadata: Metadata = {
   twitter: {
     card: "summary_large_image",
     title: "About Snupai",
-    description:
-      "Learn more about me - a student, programmer, and automation engineer.",
+    description,
     creator: "@Snupai",
   },
 };

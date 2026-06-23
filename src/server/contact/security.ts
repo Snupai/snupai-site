@@ -3,7 +3,7 @@ import type { NextRequest } from "next/server";
 import { CONTACT_RENDER_MAX_AGE_MS, CONTACT_RENDER_MIN_MS, type ContactFormPayload } from "~/lib/contact-form";
 import { env } from "~/env";
 import { isContactIpBanned } from "~/server/contact/store";
-import { redis } from "~/server/redis";
+import { getRedis } from "~/server/redis";
 import type {
   ContactAttemptMetadata,
   ContactSubmissionReason,
@@ -82,6 +82,7 @@ export function isValidContactFormToken(formToken: string, renderedAt: number) {
 }
 
 async function checkRateLimitWindow(ip: string, now: number, windowMs: number, maxRequests: number) {
+  const redis = getRedis();
   const key = createRateLimitKey(ip, windowMs);
   const minimumScore = now - windowMs;
 

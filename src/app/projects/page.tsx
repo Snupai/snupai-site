@@ -3,12 +3,15 @@ import { type Metadata } from "next";
 import { listResolvedProjectsForPublic } from "~/server/projects/store";
 import PageHeader from "~/components/PageHeader";
 
+const description =
+  "Projects by Snupai, including C# tools, bots, web experiments, automation ideas, and a few open-source projects worth recommending.";
+
 export const metadata: Metadata = {
   title: "Snupai's Projects",
-  description: "Check out my projects and other cool projects I recommend.",
+  description,
   openGraph: {
     title: "Snupai's Projects",
-    description: "Check out my projects and other cool projects I recommend.",
+    description,
     url: "https://snupai.me/projects",
     siteName: "Snupai's Website",
     locale: "en_US",
@@ -17,10 +20,12 @@ export const metadata: Metadata = {
   twitter: {
     card: "summary_large_image",
     title: "Snupai's Projects",
-    description: "Check out my projects and other cool projects I recommend.",
+    description,
     creator: "@Snupai",
   },
 };
+
+export const dynamic = "force-dynamic";
 
 export default async function ProjectsPage() {
   const { owned, shoutout } = await listResolvedProjectsForPublic();

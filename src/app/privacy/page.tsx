@@ -1,8 +1,11 @@
 import type { Metadata } from "next";
 
+const description =
+  "Privacy details for snupai.me, including how contact form submissions, metadata, moderation records, and email delivery are handled.";
+
 export const metadata: Metadata = {
   title: "Privacy Policy",
-  description: "Privacy information for snupai.me",
+  description,
 };
 
 export default function PrivacyPage() {

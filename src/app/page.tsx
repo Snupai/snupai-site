@@ -3,11 +3,13 @@ import ClickableTitle from "~/components/ClickableTitle";
 import { type Metadata } from "next";
 
 export const metadata: Metadata = {
-  title: "Snupai's Website",
-  description: "Welcome to my personal website. For fun :3",
+  title: "snupai.me - probably coding, definitely meowing",
+  description:
+    "Snupai's personal site with code projects, AI experiments, automation ideas, social links, yuri vibes, and suspicious amounts of meow.",
   openGraph: {
-    title: "Snupai's Website",
-    description: "Welcome to my personal website. For fun :3",
+    title: "snupai.me - probably coding, definitely meowing",
+    description:
+      "Snupai's personal site with code projects, AI experiments, automation ideas, social links, yuri vibes, and suspicious amounts of meow.",
     url: "https://snupai.me",
     siteName: "Snupai's Website",
     locale: "en_US",
@@ -15,8 +17,9 @@ export const metadata: Metadata = {
   },
   twitter: {
     card: "summary_large_image",
-    title: "Snupai's Website",
-    description: "Welcome to my personal website. For fun :3",
+    title: "snupai.me - probably coding, definitely meowing",
+    description:
+      "Snupai's personal site with code projects, AI experiments, automation ideas, social links, yuri vibes, and suspicious amounts of meow.",
     creator: "@Snupai",
   },
 };
@@ -47,7 +50,9 @@ export default function HomePage() {
 
         {/* One calm line */}
         <p className="max-w-sm text-balance text-base leading-relaxed text-mocha-subtext">
-          I'm a student, programmer, and automation engineer. Here's where I share my projects or so.
+          {
+            "I'm a student, programmer, and automation engineer. Here's where I share my projects or so."
+          }
         </p>
 
         {/* Inline mono navigation */}
