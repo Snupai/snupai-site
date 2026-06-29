@@ -14,12 +14,16 @@ function getTransporter() {
       pass: env.SMTP_PASS,
     },
     tls: {
-      rejectUnauthorized: false,
+      rejectUnauthorized: env.NODE_ENV !== "development",
       minVersion: "TLSv1.2",
     },
   });
 
   return transporter;
+}
+
+function sanitizeHeaderValue(value: string) {
+  return value.replace(/[\r\n]+/g, " ").trim();
 }
 
 function escapeHtml(value: string) {
@@ -40,12 +44,13 @@ export async function sendContactSubmissionEmail(record: ContactSubmissionRecord
   const safeReferer = escapeHtml(record.referer ?? "unknown");
   const safeCountry = escapeHtml(record.country ?? "unknown");
   const safeReviewUrl = escapeHtml(adminReviewUrl);
+  const subjectName = sanitizeHeaderValue(record.name);
 
   await getTransporter().sendMail({
     from: `"Contact Form" <${env.SMTP_USER}>`,
     to: env.SMTP_TO_ADDRESS,
     replyTo: record.email,
-    subject: `New Contact Form Submission from ${record.name}`,
+    subject: `New Contact Form Submission from ${subjectName}`,
     text: [
       "New Contact Form Submission",
       "",

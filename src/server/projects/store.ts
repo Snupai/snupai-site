@@ -250,7 +250,10 @@ export async function reorderManagedProjects(input: {
 }
 
 export async function listResolvedProjectsForPublic() {
-  const managedProjects = await listManagedProjects().catch(() => getDefaultManagedProjectRecords());
+  const managedProjects = await listManagedProjects().catch((error: unknown) => {
+    console.error("Failed to list managed projects; falling back to defaults", error);
+    return getDefaultManagedProjectRecords();
+  });
   const visibleProjects = managedProjects.filter((project) => project.isVisible);
   const resolved = await Promise.all(visibleProjects.map((project) => resolveManagedProject(project, 3600)));
 
