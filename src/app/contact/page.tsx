@@ -3,12 +3,15 @@ import ContactForm from "~/components/ContactForm";
 import { createContactFormToken } from "~/server/contact/security";
 import PageHeader from "~/components/PageHeader";
 
+const description =
+  "Contact Snupai by email, social links, or the contact form for project questions, small web ideas, automation experiments, and meow mail.";
+
 export const metadata: Metadata = {
   title: "Contact Snupai",
-  description: "Get in touch with me through various social platforms.",
+  description,
   openGraph: {
     title: "Contact Snupai",
-    description: "Get in touch with me through various social platforms.",
+    description,
     url: "https://snupai.me/contact",
     siteName: "Snupai's Website",
     locale: "en_US",
@@ -17,7 +20,7 @@ export const metadata: Metadata = {
   twitter: {
     card: "summary_large_image",
     title: "Contact Snupai",
-    description: "Get in touch with me through various social platforms.",
+    description,
     creator: "@Snupai",
   },
 };

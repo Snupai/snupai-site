@@ -1,6 +1,11 @@
-"use client";
-
+import type { Metadata } from "next";
 import styles from "./imprint.module.css";
+
+export const metadata: Metadata = {
+  title: "Imprint",
+  description:
+    "Legal notice and provider information for snupai.me, including contact details, responsible party, liability notes, and copyright information.",
+};
 
 export default function ImprintPage() {
   return (

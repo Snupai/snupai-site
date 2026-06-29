@@ -3,6 +3,8 @@ import AdminNav from "~/components/admin/AdminNav";
 import AdminSignOutButton from "~/components/admin/AdminSignOutButton";
 import { requireAdminSession } from "~/server/admin/auth";
 
+export const dynamic = "force-dynamic";
+
 export default async function AdminLayout({
   children,
 }: {
