@@ -1,29 +1,9 @@
-import { type Metadata } from "next";
+import { pageMetadata } from "~/lib/site-metadata";
 import ContactForm from "~/components/ContactForm";
 import { createContactFormToken } from "~/server/contact/security";
 import PageHeader from "~/components/PageHeader";
 
-const description =
-  "Contact Snupai by email, social links, or the contact form for project questions, small web ideas, automation experiments, and meow mail.";
-
-export const metadata: Metadata = {
-  title: "Contact Snupai",
-  description,
-  openGraph: {
-    title: "Contact Snupai",
-    description,
-    url: "https://snupai.me/contact",
-    siteName: "Snupai's Website",
-    locale: "en_US",
-    type: "website",
-  },
-  twitter: {
-    card: "summary_large_image",
-    title: "Contact Snupai",
-    description,
-    creator: "@Snupai",
-  },
-};
+export const metadata = pageMetadata("contact");
 
 export const dynamic = "force-dynamic";
 

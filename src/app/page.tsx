@@ -1,28 +1,8 @@
 import Link from "next/link";
 import ClickableTitle from "~/components/ClickableTitle";
-import { type Metadata } from "next";
+import { pageMetadata } from "~/lib/site-metadata";
 
-export const metadata: Metadata = {
-  title: "snupai.me - probably coding, definitely meowing",
-  description:
-    "Snupai's personal site with code projects, AI experiments, automation ideas, social links, yuri vibes, and suspicious amounts of meow.",
-  openGraph: {
-    title: "snupai.me - probably coding, definitely meowing",
-    description:
-      "Snupai's personal site with code projects, AI experiments, automation ideas, social links, yuri vibes, and suspicious amounts of meow.",
-    url: "https://snupai.me",
-    siteName: "Snupai's Website",
-    locale: "en_US",
-    type: "website",
-  },
-  twitter: {
-    card: "summary_large_image",
-    title: "snupai.me - probably coding, definitely meowing",
-    description:
-      "Snupai's personal site with code projects, AI experiments, automation ideas, social links, yuri vibes, and suspicious amounts of meow.",
-    creator: "@Snupai",
-  },
-};
+export const metadata = pageMetadata("home");
 
 const links = [
   { href: "/about", label: "About" },

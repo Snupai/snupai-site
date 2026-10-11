@@ -1,27 +1,7 @@
-import { type Metadata } from "next";
+import { pageMetadata } from "~/lib/site-metadata";
 import PageHeader from "~/components/PageHeader";
 
-const description =
-  "About Snupai: a German applied computer science student who codes for fun, experiments with AI, and builds small automation projects.";
-
-export const metadata: Metadata = {
-  title: "About Snupai",
-  description,
-  openGraph: {
-    title: "About Snupai",
-    description,
-    url: "https://snupai.me/about",
-    siteName: "Snupai's Website",
-    locale: "en_US",
-    type: "website",
-  },
-  twitter: {
-    card: "summary_large_image",
-    title: "About Snupai",
-    description,
-    creator: "@Snupai",
-  },
-};
+export const metadata = pageMetadata("about");
 
 export const dynamic = "force-dynamic";
 

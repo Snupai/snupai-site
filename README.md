@@ -31,3 +31,22 @@ This site is deployed on Vercel. Any push to the main branch will trigger an aut
 ## License
 
 This project is open source and available under the MIT License.
+
+## Link previews
+
+Public pages expose a [Discord component embed](https://docs.discord.com/developers/link-previews/component-embeds)
+with a page title, description, site thumbnail, lavender accent, and navigation buttons.
+The server-rendered head links to a static `/embeds/<page>` JSON payload. Open Graph
+and Twitter metadata provide a fallback with a page-specific 1200 × 630 PNG.
+
+Edit `src/lib/site-metadata.ts` for page copy and metadata,
+`src/lib/discord-embed.ts` for the component layout, and
+`src/app/share/[image]/route.tsx` for the fallback image design. Payloads and images
+are generated during `next build`, without external API or font requests.
+Keep component payloads under Discord's 3,000-byte limit and buttons in link style.
+
+After deployment, check a public URL in the
+[Discord Embed Debugger](https://discord.com/developers/embeds).
+Discord caches previews for about 30 minutes; use a fresh query string (such as
+`?embed=2`) when testing an updated preview. Local HTML checks cannot confirm the
+final rendering in Discord.

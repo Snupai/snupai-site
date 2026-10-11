@@ -1,3 +1,4 @@
+import { pageMetadata } from "~/lib/site-metadata";
 import GuideViewer from './GuideViewer';
 import { unified } from 'unified';
 import remarkParse from 'remark-parse';
@@ -5,6 +6,8 @@ import remarkGfm from 'remark-gfm';
 import remarkRehype from 'remark-rehype';
 import rehypeStringify from 'rehype-stringify';
 import { headers } from 'next/headers';
+
+export const metadata = pageMetadata("hosting-guide");
 
 export const dynamic = 'force-dynamic';
 
