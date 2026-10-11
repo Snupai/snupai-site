@@ -1,12 +1,6 @@
-import type { Metadata } from "next";
+import { pageMetadata } from "~/lib/site-metadata";
 
-const description =
-  "Privacy details for snupai.me, including how contact form submissions, metadata, moderation records, and email delivery are handled.";
-
-export const metadata: Metadata = {
-  title: "Privacy Policy",
-  description,
-};
+export const metadata = pageMetadata("privacy");
 
 export default function PrivacyPage() {
   return (

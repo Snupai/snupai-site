@@ -1,29 +1,9 @@
 import ProjectList from "~/components/ProjectList";
-import { type Metadata } from "next";
+import { pageMetadata } from "~/lib/site-metadata";
 import { listResolvedProjectsForPublic } from "~/server/projects/store";
 import PageHeader from "~/components/PageHeader";
 
-const description =
-  "Projects by Snupai, including C# tools, bots, web experiments, automation ideas, and a few open-source projects worth recommending.";
-
-export const metadata: Metadata = {
-  title: "Snupai's Projects",
-  description,
-  openGraph: {
-    title: "Snupai's Projects",
-    description,
-    url: "https://snupai.me/projects",
-    siteName: "Snupai's Website",
-    locale: "en_US",
-    type: "website",
-  },
-  twitter: {
-    card: "summary_large_image",
-    title: "Snupai's Projects",
-    description,
-    creator: "@Snupai",
-  },
-};
+export const metadata = pageMetadata("projects");
 
 export const revalidate = 0;
 
