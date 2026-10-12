@@ -7,6 +7,7 @@
         "@ai-sdk/google": "^1.2.12",
         "@google/generative-ai": "^0.24.0",
         "@hookform/resolvers": "^3.10.0",
+        "@plausible-analytics/tracker": "0.4.6",
         "@t3-oss/env-nextjs": "^0.10.1",
         "@tanstack/react-query": "^5.81.5",
         "@trpc/client": "^11.8.1",
@@ -183,6 +184,8 @@
     "@panva/hkdf": ["@panva/hkdf@1.2.1", "", {}, "sha512-6oclG6Y3PiDFcoyk8srjLfVKyMfVCKJ27JwNPViuXziFpmdz+MZnZN/aKY0JGXgYuO/VghU0jcOAZgWXZ1Dmrw=="],
 
     "@pkgjs/parseargs": ["@pkgjs/parseargs@0.11.0", "", {}, "sha512-+1VkjdD0QBLPodGrJUeqarH8VAIvQODIbwh9XpP5Syisf7YoQgsJKPNFoqqLQlu+VQ/tVSshMR6loPMn8U+dPg=="],
+
+    "@plausible-analytics/tracker": ["@plausible-analytics/tracker@0.4.6", "", {}, "sha512-nbu6xGgSP6jeYuoVklZBzucUnIpo75tVu3Kr+R0EDycVKaMC/jF5Q/YCaM/8gR4fPZ1IDcXt6FdBJFZ1uZwEPA=="],
 
     "@rtsao/scc": ["@rtsao/scc@1.1.0", "", {}, "sha512-zt6OdqaDoOnJ1ZYsCYGt9YmWzDXl4vQdKTyJev62gFhRGKdx7mcT54V9KIjg+d2wi9EXsPvAPKe7i7WjfVWB8g=="],
 

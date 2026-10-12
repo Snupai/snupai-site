@@ -7,6 +7,7 @@ import { TRPCReactProvider } from "~/trpc/react";
 import Footer from "~/components/Footer";
 import Navigation from "~/components/Navigation";
 import SiteBackground from "~/components/SiteBackground";
+import PlausibleAnalytics from "~/components/PlausibleAnalytics";
 
 export const metadata: Metadata = {
   metadataBase: new URL(siteUrl),
@@ -27,6 +28,7 @@ export default function RootLayout({
   return (
     <html lang="en" className={`${GeistSans.variable}`}>
       <body>
+        <PlausibleAnalytics />
         <TRPCReactProvider>
           <div className="relative flex min-h-screen flex-col">
             <SiteBackground />

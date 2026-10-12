@@ -13,6 +13,20 @@ export default function PrivacyPage() {
         <div className="w-full max-w-3xl space-y-6">
           <div className="space-y-4 rounded-xl border border-mocha-surface bg-mocha-mantle/60 p-6 backdrop-blur-sm transition-colors hover:border-mocha-lavender">
             <h2 className="highlight-text text-2xl font-bold">
+              Website analytics
+            </h2>
+            <p className="text-mocha-subtext1 text-base leading-relaxed">
+              We use self-hosted Plausible Analytics at visits.snupai.dev to
+              understand visits and page navigation. Plausible does not use
+              cookies. Analytics include page URLs, referring sites, browser and
+              device information, and approximate location derived from the
+              request IP address. Contact form contents are not sent to
+              analytics, and admin pages are excluded.
+            </p>
+          </div>
+
+          <div className="space-y-4 rounded-xl border border-mocha-surface bg-mocha-mantle/60 p-6 backdrop-blur-sm transition-colors hover:border-mocha-lavender">
+            <h2 className="highlight-text text-2xl font-bold">
               Contact form processing
             </h2>
             <p className="text-mocha-subtext1 text-base leading-relaxed">

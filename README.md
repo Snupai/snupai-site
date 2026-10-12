@@ -26,7 +26,24 @@ This is my personal website built with Next.js and styled with Tailwind CSS usin
 
 ## Deployment
 
-This site is deployed on Vercel. Any push to the main branch will trigger an automatic deployment.
+This site is deployed on Vercel. Any push to the master branch will trigger an automatic deployment.
+
+## Analytics
+
+Plausible tracks production visits to `snupai.me` and `www.snupai.me` through
+`https://visits.snupai.dev/api/event`. The dashboard is
+[visits.snupai.dev/snupai.me](https://visits.snupai.dev/snupai.me), with reporting
+timezone Europe/Berlin. No API key or environment variable is required.
+
+`src/components/PlausibleAnalytics.tsx` initializes the official NPM tracker
+after hydration and automatically captures pageviews, including client-side
+navigation. Development, preview hostnames, and `/admin` routes are excluded.
+Form contents and custom properties are not collected by this integration.
+To exclude your own visits, set `localStorage.plausible_ignore = "true"` in your
+browser console on the production site.
+
+After deploying, visit the production site and use **Verify NPM installation**
+in Plausible to confirm live event receipt.
 
 ## License
 
