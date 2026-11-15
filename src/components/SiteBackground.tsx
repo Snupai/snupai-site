@@ -23,7 +23,9 @@ export default function SiteBackground() {
       {env.SITE_BACKGROUND === "rain" ? (
         <AsciiWave className="h-full w-full text-[0.6rem] leading-[0.9rem] text-mocha-sapphire opacity-[0.38] [filter:drop-shadow(0_0_6px_rgba(137,220,235,0.35))] [mask-image:radial-gradient(ellipse_75%_75%_at_50%_45%,black,transparent_92%)] sm:text-[0.72rem]" />
       ) : (
-        <FallingLeaves className="h-full w-full opacity-[0.55] [filter:drop-shadow(0_0_4px_rgba(210,105,30,0.3))] [mask-image:linear-gradient(to_bottom,transparent,black_18%)]" />
+        // Stop at the fixed h-12 footer so the leaf pile rests on top of it
+        // instead of being hidden behind it.
+        <FallingLeaves className="absolute inset-x-0 top-0 bottom-12 h-[calc(100%-3rem)] w-full opacity-[0.55] [filter:drop-shadow(0_0_4px_rgba(210,105,30,0.3))] [mask-image:linear-gradient(to_bottom,transparent,black_18%)]" />
       )}
     </div>
   );
