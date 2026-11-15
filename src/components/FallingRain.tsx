@@ -427,7 +427,7 @@ export default function FallingRain({
         const frac = lv - full;
         // Body rows: deeper water is darker.
         for (let r = 0; r < full; r++) {
-          plot(x, h - 1 - r, r === 0 ? WATER_DEEP : WATER, 0.7);
+          plot(x, h - 1 - r, r === 0 ? WATER_DEEP : WATER, 0.8);
         }
         // Surface row: partial depth shows as a fainter sheen, with a
         // drifting shimmer of highlights across it.
@@ -437,9 +437,9 @@ export default function FallingRain({
           Math.sin(x * 0.21 + t * 0.0021) +
           Math.sin(x * 0.077 - t * 0.0013 + 2.1) * 0.8 +
           Math.sin(x * 0.53 + t * 0.0047) * 0.35;
-        if (s > 1.45) plot(x, sy, GLINT, 0.85 * presence);
-        else if (s > 0.6) plot(x, sy, SHIMMER, 0.6 * presence);
-        else plot(x, sy, WATER, (0.35 + 0.35 * frac) * presence);
+        if (s > 1.3) plot(x, sy, GLINT, 0.95 * presence);
+        else if (s > 0.35) plot(x, sy, SHIMMER, 0.75 * presence);
+        else plot(x, sy, WATER, (0.6 + 0.3 * frac) * presence);
       }
 
       for (const r of ripples) {
