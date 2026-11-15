@@ -32,6 +32,15 @@ const WATER_DEEP: RGB = [30, 70, 104];
 const WATER: RGB = [52, 110, 150];
 const SHIMMER: RGB = [137, 220, 235];
 const GLINT: RGB = [205, 240, 255];
+const FOG: RGB = [148, 156, 184];
+const FLASH: RGB = [214, 222, 255];
+
+/** Fog alpha at full density. */
+const FOG_ALPHA = 0.34;
+/** Number of stepped fog density levels. */
+const FOG_LEVELS = 5;
+/** Peak alpha of a lightning glow. Kept low so it reads as distant and stays gentle on the eyes. */
+const FLASH_ALPHA = 0.15;
 
 /** Puddle depth limit in art pixels. */
 const MAX_LEVEL = 3;
@@ -81,10 +90,22 @@ interface Gust {
   front: number;
 }
 
+interface Flash {
+  /** Column the glow is centred on (the "cloud" that lit up). */
+  x: number;
+  age: number;
+  /** Flicker pulses: start time (ms into the flash), decay time, strength 0..1. */
+  pulses: { at: number; decay: number; peak: number }[];
+}
+
 interface FallingRainProps {
   className?: string;
   /** Whether pointer movement stirs the rain like a passing breeze. */
   interactive?: boolean;
+  /** Whether low fog banks occasionally roll in. */
+  fog?: boolean;
+  /** Whether occasional storm spells bring faint lightning glows. */
+  storms?: boolean;
 }
 
 /**
@@ -98,12 +119,20 @@ interface FallingRainProps {
  * briefly thickening it. Near drops splash where they hit the bottom edge
  * (the top of the footer), throwing droplets and rippling a thin shimmering
  * puddle that fills up the longer the page stays open. The pointer acts as
- * a light breeze. Throttled to ~30fps, pauses when hidden, and respects
- * prefers-reduced-motion with a single still frame.
+ * a light breeze.
+ *
+ * The weather wanders too: now and then a dithered fog bank rolls in low
+ * over the ground and drifts with the wind, and occasional storm spells
+ * bring distant lightning, a faint glow that flickers once to three times
+ * and briefly lights up the rain. Capped at ~60fps with an even cadence, pauses when hidden,
+ * and respects prefers-reduced-motion with a single still frame (no
+ * lightning).
  */
 export default function FallingRain({
   className,
   interactive = true,
+  fog: fogEnabled = true,
+  storms: stormsEnabled = true,
 }: FallingRainProps) {
   const canvasRef = useRef<HTMLCanvasElement>(null);
 
@@ -142,6 +171,20 @@ export default function FallingRain({
     let elapsed = 0;
 
     const rand = (min: number, max: number) => min + Math.random() * (max - min);
+
+    // Weather. Fog always starts clear and eases toward a target that changes
+    // every so often, so it only ever rolls in gradually. A fresh page can
+    // already be stormy.
+    const pickFog = () => (fogEnabled && Math.random() < 0.65 ? rand(0.45, 1) : 0);
+    let fogTarget = pickFog();
+    let fog = 0;
+    let nextFogShift = rand(25000, 70000);
+    let fogDrift = 0;
+
+    let storm = stormsEnabled && Math.random() < 0.25;
+    let nextStormShift = storm ? rand(40000, 90000) : rand(45000, 120000);
+    let nextStrike = rand(2000, 6000);
+    let flash: Flash | null = null;
 
     const pickLayer = (): 0 | 1 | 2 => {
       const r = Math.random();
@@ -183,8 +226,33 @@ export default function FallingRain({
         1,
         0.78 +
           0.2 * Math.sin(elapsed * 0.00004 + windPhase * 2) +
-          (gust ? 0.25 * gustEnvelope(gust) : 0),
+          (gust ? 0.25 * gustEnvelope(gust) : 0) +
+          (storm ? 0.12 : 0),
       );
+
+    /** Current lightning brightness 0..1: a fast rise, then an exponential fade per pulse. */
+    const flashLevel = () => {
+      if (!flash) return 0;
+      let v = 0;
+      for (const p of flash.pulses) {
+        const t = flash.age - p.at;
+        if (t < 0) continue;
+        v = Math.max(v, p.peak * Math.min(1, t / 30) * Math.exp(-Math.max(0, t - 30) / p.decay));
+      }
+      return v;
+    };
+
+    const strike = (): Flash => {
+      // One to three flickers, spaced well apart (never more than ~3 per second).
+      const count = 1 + (Math.random() < 0.6 ? 1 : 0) + (Math.random() < 0.3 ? 1 : 0);
+      const pulses: Flash['pulses'] = [];
+      let at = 0;
+      for (let i = 0; i < count; i++) {
+        pulses.push({ at, decay: rand(70, 160), peak: i === 0 ? rand(0.6, 1) : rand(0.35, 0.85) });
+        at += rand(140, 260);
+      }
+      return { x: rand(0.1, 0.9) * w, age: 0, pulses };
+    };
 
     const surfaceY = (x: number) => {
       const c = Math.min(w - 1, Math.max(0, Math.round(x)));
@@ -340,9 +408,35 @@ export default function FallingRain({
         };
       }
 
-      pointerVX *= 0.9;
+      pointerVX *= 0.9 ** k;
       const base = baseWind(elapsed);
       const respawnChance = intensity();
+
+      // Fog: occasionally pick a new density, move steadily toward it, and
+      // let the bank drift with the wind.
+      if (fogEnabled && (nextFogShift -= dt) <= 0) {
+        fogTarget = Math.random() < 0.25 ? 0 : rand(0.45, 1);
+        nextFogShift = rand(25000, 70000);
+      }
+      // Roll in (or lift) at a steady pace: a full bank takes ~25s.
+      const fogStep = dt / 25000;
+      fog += Math.min(fogStep, Math.max(-fogStep, fogTarget - fog));
+      fogDrift += roughSlant() * dt * 0.008;
+
+      // Storm spells come and go; during one, lightning strikes every few seconds.
+      if (stormsEnabled && (nextStormShift -= dt) <= 0) {
+        storm = Math.random() < 0.35;
+        nextStormShift = storm ? rand(40000, 90000) : rand(60000, 150000);
+        nextStrike = rand(1500, 5000);
+      }
+      if (flash) {
+        flash.age += dt;
+        const last = flash.pulses[flash.pulses.length - 1]!;
+        if (flash.age > last.at + last.decay * 6) flash = null;
+      } else if (storm && (nextStrike -= dt) <= 0) {
+        flash = strike();
+        nextStrike = rand(5000, 16000);
+      }
 
       for (const d of drops) {
         if (d.wait > 0) {
@@ -371,7 +465,10 @@ export default function FallingRain({
           else d.wait = rand(150, 900);
           continue;
         }
-        if (d.x < -60 || d.x > w + 60) spawn(d, false);
+        // Only recycle drops that have blown off the downwind side. Drops
+        // spawned far upwind start offscreen on purpose and must be left to
+        // drift in, or strong wind leaves the upwind corner dry.
+        if ((d.vx >= 0 && d.x > w + 60) || (d.vx <= 0 && d.x < -60)) spawn(d, false);
       }
 
       for (let i = particles.length - 1; i >= 0; i--) {
@@ -379,7 +476,7 @@ export default function FallingRain({
         p.life -= dt;
         if (!p.still) {
           p.vy += 0.16 * k;
-          p.vx *= 0.99;
+          p.vx *= 0.99 ** k;
           p.x += p.vx * k;
           p.y += p.vy * k;
         }
@@ -401,7 +498,7 @@ export default function FallingRain({
       flowPuddle(k);
     };
 
-    const drawDrop = (d: Drop) => {
+    const drawDrop = (d: Drop, lit: number) => {
       const L = LAYERS[d.layer];
       const slope = d.vx / d.vy; // horizontal px per vertical px
       const hx = d.x;
@@ -409,12 +506,96 @@ export default function FallingRain({
       // Far drops fade out as they reach their vanishing row.
       const fade =
         d.layer === 0 ? Math.min(1, Math.max(0, (d.endY - d.y) / 12) + 0.15) : 1;
+      // Lightning makes the streaks catch the light.
+      const boost = 1 + lit * 0.9;
       for (let i = 0; i < d.len; i++) {
         const y = hy - i;
         const x = Math.round(hx - slope * i);
         const t = i / d.len;
-        const a = L.alpha * fade * (1 - t) ** 0.8;
+        const a = Math.min(1, L.alpha * fade * boost * (1 - t) ** 0.8);
         plot(x, y, i === 0 ? L.head : L.body, a);
+      }
+    };
+
+    let flashCol = new Float32Array(0);
+
+    /** Stable pseudo-random 0..1 per integer lattice point. */
+    const hash = (x: number, y: number) => {
+      let n = (Math.imul(x, 374761393) + Math.imul(y, 668265263)) | 0;
+      n = Math.imul(n ^ (n >>> 13), 1274126177);
+      return ((n ^ (n >>> 16)) >>> 0) / 4294967296;
+    };
+
+    /** Smooth 2D value noise, 0..1. */
+    const noise = (x: number, y: number) => {
+      const ix = Math.floor(x);
+      const iy = Math.floor(y);
+      const fx = x - ix;
+      const fy = y - iy;
+      const ux = fx * fx * (3 - 2 * fx);
+      const uy = fy * fy * (3 - 2 * fy);
+      const a = hash(ix, iy);
+      const b = hash(ix + 1, iy);
+      const c = hash(ix, iy + 1);
+      const d = hash(ix + 1, iy + 1);
+      return a + (b - a) * ux + (c - a) * uy + (a - b - c + d) * ux * uy;
+    };
+
+    /**
+     * Low fog: two octaves of drifting value noise make soft billows that
+     * thicken toward the ground. Density is stepped into a few flat alpha
+     * levels, so the fog reads as soft pixel-art contours.
+     */
+    const drawFog = (lit: number) => {
+      if (fog < 0.02) return;
+      const c: RGB = [
+        FOG[0] + (FLASH[0] - FOG[0]) * lit,
+        FOG[1] + (FLASH[1] - FOG[1]) * lit,
+        FOG[2] + (FLASH[2] - FOG[2]) * lit,
+      ];
+      const alpha = FOG_ALPHA * (1 + lit * 0.6);
+      // Big banks roll with the wind; finer wisps drift a bit slower and churn.
+      const bigX = fogDrift / 70;
+      const bigY = elapsed * 0.000035;
+      const fineX = (fogDrift * 0.65) / 28;
+      const fineY = -elapsed * 0.00008;
+      const top = Math.floor(h * 0.34);
+      // Sampled once per 2×2 block: chunkier pixels, and a quarter of the work.
+      for (let y = top; y < h; y += 2) {
+        const p = (y - top) / (h - top);
+        const rise = fog * p * (2 - p);
+        if (rise < 0.03) continue;
+        const by = y / 20 + bigY;
+        const fy = y / 10 + fineY + 40;
+        for (let x = 0; x < w; x += 2) {
+          const n = 0.75 * noise(x / 70 - bigX, by) + 0.25 * noise(x / 28 - fineX + 80, fy);
+          // A solid base layer with gentle banks on top, so thin spots stay
+          // fog-coloured instead of opening up into holes.
+          const bank = Math.min(1, Math.max(0, (n - 0.2) / 0.6));
+          const v = rise * (0.5 + 0.5 * bank);
+          const level = Math.floor(v * FOG_LEVELS) / FOG_LEVELS;
+          if (level <= 0) continue;
+          const a = alpha * level;
+          plot(x, y, c, a);
+          plot(x + 1, y, c, a);
+          plot(x, y + 1, c, a);
+          plot(x + 1, y + 1, c, a);
+        }
+      }
+    };
+
+    /** A distant lightning glow: brightest high up, centred on one column. */
+    const drawFlash = (lit: number) => {
+      if (!flash || lit < 0.01) return;
+      if (flashCol.length !== w) flashCol = new Float32Array(w);
+      const spread = w * 0.35;
+      for (let x = 0; x < w; x++) {
+        const dx = (x - flash.x) / spread;
+        flashCol[x] = 0.3 + 0.7 * Math.exp(-dx * dx);
+      }
+      for (let y = 0; y < h; y++) {
+        const rowA = FLASH_ALPHA * lit * (1 - 0.65 * (y / h));
+        for (let x = 0; x < w; x++) plot(x, y, FLASH, rowA * flashCol[x]!);
       }
     };
 
@@ -456,10 +637,14 @@ export default function FallingRain({
     const draw = () => {
       if (!image) return;
       buf.fill(0);
+      const lit = flashLevel();
+      drawFlash(lit);
       drawPuddle();
-      // Far to near so near rain lands on top.
+      // Far to near so near rain lands on top. Fog sits between the far
+      // layer and the rest, so distant rain disappears into it.
       for (let layer = 0; layer < 3; layer++) {
-        for (const d of drops) if (d.layer === layer && d.wait <= 0) drawDrop(d);
+        for (const d of drops) if (d.layer === layer && d.wait <= 0) drawDrop(d, lit);
+        if (layer === 0) drawFog(lit);
       }
       for (const p of particles) {
         const a = p.still ? 0.7 : 0.9 * Math.min(1, (p.life / p.maxLife) * 1.5);
@@ -471,11 +656,15 @@ export default function FallingRain({
     let frameId = 0;
     let lastFrame = 0;
     let running = true;
-    const FRAME_INTERVAL = 1000 / 30;
+    // ~60fps cap. The slack absorbs rAF timing jitter so a 60Hz display draws
+    // every frame and a 120Hz display draws exactly every other one, instead
+    // of occasionally skipping a frame and juddering.
+    const FRAME_INTERVAL = 1000 / 60;
+    const FRAME_SLACK = 4;
 
     const loop = (time: number) => {
       if (!running) return;
-      if (time - lastFrame >= FRAME_INTERVAL) {
+      if (time - lastFrame >= FRAME_INTERVAL - FRAME_SLACK) {
         lastFrame = time;
         step(time);
         draw();
@@ -542,7 +731,7 @@ export default function FallingRain({
       document.removeEventListener('pointerleave', onPointerLeave);
       document.removeEventListener('visibilitychange', onVisibility);
     };
-  }, [interactive]);
+  }, [interactive, fogEnabled, stormsEnabled]);
 
   return (
     <canvas
