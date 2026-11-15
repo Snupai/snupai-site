@@ -15,6 +15,9 @@ import DynamicBackground from "~/components/DynamicBackground";
  *   - "rain": pixel-art rain with wind gusts, splashes and a puddle line
  *     that fills up on top of the footer
  *   - "snow": pixel-art snowfall that drifts into a pile on top of the footer
+ *   - "night": a pixel-art starry night with an aurora, the moon in its real
+ *     phase, shooting stars, and a river with fireflies that runs on behind
+ *     the footer
  *   - "dynamic": picks one of the above from the visitor's local date, using
  *     the table in `~/lib/seasonalBackground`
  */

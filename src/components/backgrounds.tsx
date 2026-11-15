@@ -1,10 +1,12 @@
 import FallingLeaves from "~/components/FallingLeaves";
 import FallingRain from "~/components/FallingRain";
 import FallingSnow from "~/components/FallingSnow";
+import NightSky from "~/components/NightSky";
 
 // Rain and snow stop at the fixed h-12 footer so puddles and drifts rest on
-// top of it. Leaves use the full viewport so their pile rises softly from
-// behind the footer's blur instead of sitting on a hard line at its edge.
+// top of it. Leaves and the night river use the full viewport so the pile
+// and the water run on softly behind the footer's blur instead of sitting on
+// a hard line at its edge.
 const LAYER = "absolute inset-x-0 top-0 bottom-12 h-[calc(100%-3rem)] w-full";
 const FULL_LAYER = "absolute inset-0 h-full w-full";
 const FADE_IN = "[mask-image:linear-gradient(to_bottom,transparent,black_18%)]";
@@ -25,6 +27,8 @@ export const BACKGROUNDS = {
       className={`${LAYER} opacity-[0.7] [filter:drop-shadow(0_0_3px_rgba(137,220,235,0.3))] ${FADE_IN}`}
     />
   ),
+  // An opaque scene with its own sky, so no fade-in mask.
+  night: () => <NightSky className={`${FULL_LAYER} opacity-[0.92]`} />,
   snow: () => (
     <FallingSnow
       className={`${LAYER} opacity-[0.6] [filter:drop-shadow(0_0_3px_rgba(205,225,255,0.35))] ${FADE_IN}`}
