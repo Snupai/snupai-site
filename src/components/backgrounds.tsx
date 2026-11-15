@@ -2,9 +2,11 @@ import FallingLeaves from "~/components/FallingLeaves";
 import FallingRain from "~/components/FallingRain";
 import FallingSnow from "~/components/FallingSnow";
 
-// Every canvas stops at the fixed h-12 footer so piles, puddles and drifts
-// rest on top of it instead of being hidden behind it.
+// Rain and snow stop at the fixed h-12 footer so puddles and drifts rest on
+// top of it. Leaves use the full viewport so their pile rises softly from
+// behind the footer's blur instead of sitting on a hard line at its edge.
 const LAYER = "absolute inset-x-0 top-0 bottom-12 h-[calc(100%-3rem)] w-full";
+const FULL_LAYER = "absolute inset-0 h-full w-full";
 const FADE_IN = "[mask-image:linear-gradient(to_bottom,transparent,black_18%)]";
 
 /**
@@ -15,7 +17,7 @@ const FADE_IN = "[mask-image:linear-gradient(to_bottom,transparent,black_18%)]";
 export const BACKGROUNDS = {
   leaves: () => (
     <FallingLeaves
-      className={`${LAYER} opacity-[0.55] [filter:drop-shadow(0_0_4px_rgba(210,105,30,0.3))] ${FADE_IN}`}
+      className={`${FULL_LAYER} opacity-[0.55] [filter:drop-shadow(0_0_4px_rgba(210,105,30,0.3))] ${FADE_IN}`}
     />
   ),
   rain: () => (
