@@ -1,5 +1,5 @@
 import { env } from "~/env";
-import AsciiWave from "~/components/AsciiWave";
+import FallingRain from "~/components/FallingRain";
 import FallingLeaves from "~/components/FallingLeaves";
 
 /**
@@ -12,7 +12,8 @@ import FallingLeaves from "~/components/FallingLeaves";
  * The variant is chosen by the `SITE_BACKGROUND` env var:
  *   - "leaves" (default): pixel-art falling autumn leaves that pile up at
  *     the bottom of the viewport over time
- *   - "rain": ASCII matrix-style rain
+ *   - "rain": pixel-art rain with wind gusts, splashes and a puddle line
+ *     that fills up on top of the footer
  */
 export default function SiteBackground() {
   return (
@@ -21,7 +22,9 @@ export default function SiteBackground() {
       className="pointer-events-none fixed inset-0 -z-10 flex items-center justify-center"
     >
       {env.SITE_BACKGROUND === "rain" ? (
-        <AsciiWave className="h-full w-full text-[0.6rem] leading-[0.9rem] text-mocha-sapphire opacity-[0.38] [filter:drop-shadow(0_0_6px_rgba(137,220,235,0.35))] [mask-image:radial-gradient(ellipse_75%_75%_at_50%_45%,black,transparent_92%)] sm:text-[0.72rem]" />
+        // Like the leaves, stop at the fixed h-12 footer so splashes and the
+        // puddle land on top of it.
+        <FallingRain className="absolute inset-x-0 top-0 bottom-12 h-[calc(100%-3rem)] w-full opacity-[0.7] [filter:drop-shadow(0_0_3px_rgba(137,220,235,0.3))] [mask-image:linear-gradient(to_bottom,transparent,black_18%)]" />
       ) : (
         // Stop at the fixed h-12 footer so the leaf pile rests on top of it
         // instead of being hidden behind it.
