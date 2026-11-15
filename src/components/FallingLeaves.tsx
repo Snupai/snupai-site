@@ -82,17 +82,30 @@ const COLORS = PALETTES.flat();
 const PX = 4;
 
 interface Leaf {
+  /** Centre of the swing, drifts with wind and breeze. */
+  baseX: number;
   x: number;
   y: number;
-  vy: number;
+  /** Extra horizontal velocity from the pointer breeze. */
   vx: number;
-  swayAmp: number;
-  swayFreq: number;
-  swayPhase: number;
-  spin: number;
-  spinSpeed: number;
+  fall: number;
+  swingAmp: number;
+  swingFreq: number;
+  phase: number;
+  /** Resting in-plane orientation of the leaf (radians). */
+  orient: number;
+  tiltMax: number;
+  /** Rotation about the leaf's own axis, drives horizontal foreshortening. */
+  flip: number;
+  flipVel: number;
+  rockAmp: number;
+  /** Tumblers spin end over end instead of gliding side to side. */
+  tumbler: boolean;
+  spinVel: number;
   sprite: number;
   palette: number;
+  /** Lowest drawn pixel relative to y, refreshed every draw. */
+  bottom: number;
 }
 
 interface FallingLeavesProps {
@@ -105,12 +118,14 @@ interface FallingLeavesProps {
  * A calm pixel-art falling-leaves backdrop.
  *
  * Renders to a low-resolution canvas scaled up with nearest-neighbour
- * sampling so every leaf stays crisp and blocky. Leaves drift down with a
- * soft sideways sway and "tumble" by squashing horizontally (showing their
- * darker back side mid-flip). Leaves that reach the bottom settle into a pile
- * that slowly grows the longer the page is open, up to a capped height. The
- * pointer acts as a light breeze. Throttled to ~30fps, pauses when hidden, and
- * respects prefers-reduced-motion.
+ * sampling so every leaf stays crisp and blocky. Leaves fall like real ones:
+ * most glide in a pendulum "falling leaf" swing (tilting into the swing,
+ * slowing and briefly lifting at each end), while some tumble end over end.
+ * Each leaf rotates in-plane and foreshortens on two axes, showing its darker
+ * back side mid-flip, and a slow gusting wind pushes them all. Leaves that
+ * reach the bottom drape onto a pile that grows the longer the page is open,
+ * up to a capped height. The pointer acts as a light breeze. Throttled to
+ * ~30fps, pauses when hidden, and respects prefers-reduced-motion.
  */
 export default function FallingLeaves({
   className,
@@ -134,6 +149,8 @@ export default function FallingLeaves({
     let leaves: Leaf[] = [];
 
     // Leaf pile: grid of colour indices (+1), row 0 = bottom of the screen.
+    // Columns are always filled contiguously from the bottom, so `heights`
+    // fully describes the surface.
     let pileCap = 0;
     let pile = new Uint8Array(0);
     let heights = new Int16Array(0);
@@ -147,19 +164,32 @@ export default function FallingLeaves({
     let pointerY = -1;
     let pointerVX = 0;
 
-    const spawn = (anywhere: boolean): Leaf => ({
-      x: Math.random() * w,
-      y: anywhere ? Math.random() * h : -10 - Math.random() * 20,
-      vy: 0.12 + Math.random() * 0.22,
-      vx: 0,
-      swayAmp: 0.15 + Math.random() * 0.35,
-      swayFreq: 0.0006 + Math.random() * 0.0009,
-      swayPhase: Math.random() * Math.PI * 2,
-      spin: Math.random() * Math.PI * 2,
-      spinSpeed: 0.0008 + Math.random() * 0.0018,
-      sprite: Math.floor(Math.random() * SPRITES.length),
-      palette: Math.floor(Math.random() * PALETTES.length),
-    });
+    const rand = (min: number, max: number) => min + Math.random() * (max - min);
+
+    const spawn = (anywhere: boolean): Leaf => {
+      const tumbler = Math.random() < 0.25;
+      const x = Math.random() * w;
+      return {
+        baseX: x,
+        x,
+        y: anywhere ? Math.random() * h * 0.85 : rand(-30, -10),
+        vx: 0,
+        fall: tumbler ? rand(0.35, 0.55) : rand(0.22, 0.4),
+        swingAmp: tumbler ? rand(1, 3) : rand(4, 11),
+        swingFreq: rand(0.0011, 0.002),
+        phase: Math.random() * Math.PI * 2,
+        orient: rand(-0.6, 0.6),
+        tiltMax: rand(0.45, 0.85),
+        flip: rand(-0.4, 0.4),
+        flipVel: tumbler ? rand(0.004, 0.008) * (Math.random() < 0.5 ? -1 : 1) : 0,
+        rockAmp: rand(0.5, 1.1),
+        tumbler,
+        spinVel: tumbler ? rand(0.0015, 0.004) * (Math.random() < 0.5 ? -1 : 1) : 0,
+        sprite: Math.floor(Math.random() * SPRITES.length),
+        palette: Math.floor(Math.random() * PALETTES.length),
+        bottom: 4,
+      };
+    };
 
     /** Paint one pile cell onto the offscreen pile canvas. */
     const paintPileCell = (x: number, row: number) => {
@@ -189,11 +219,9 @@ export default function FallingLeaves({
       pileCanvas.width = w;
       pileCanvas.height = pileCap;
       for (let x = 0; x < w; x++) {
-        for (let r = 0; r < pileCap; r++) {
-          if (pile[r * w + x]) {
-            heights[x] = r + 1;
-            paintPileCell(x, r);
-          }
+        for (let r = 0; r < pileCap && pile[r * w + x]; r++) {
+          heights[x] = r + 1;
+          paintPileCell(x, r);
         }
       }
     };
@@ -213,57 +241,58 @@ export default function FallingLeaves({
       if (leaves.length > target) leaves = leaves.slice(0, target);
     };
 
+    /** Current in-plane rotation and two-axis foreshortening of a leaf. */
+    const pose = (leaf: Leaf) => {
+      const swing = Math.cos(leaf.phase); // ∝ sideways velocity
+      const theta = leaf.tumbler
+        ? leaf.orient
+        : leaf.orient + leaf.tiltMax * swing; // dip into the swing
+      const a = Math.cos(
+        leaf.tumbler ? leaf.flip : leaf.flip + leaf.rockAmp * Math.sin(leaf.phase),
+      );
+      // Pitch: the leaf foreshortens vertically near the ends of each swing.
+      const b = Math.cos(leaf.tumbler ? leaf.flip * 0.6 : 0.7 * Math.sin(leaf.phase));
+      return { theta, a, b };
+    };
+
     /**
-     * Visit every pixel of a leaf at its current tumble. Offsets are relative
-     * to the leaf centre; `rowFromBottom` counts up from the sprite's base.
+     * Draw a leaf by inverse-mapping each screen pixel in its bounding box back
+     * into sprite space (rotate, then un-scale), so rotated leaves have no holes.
      */
-    const forEachPixel = (
-      leaf: Leaf,
-      minScale: number,
-      fn: (dx: number, dy: number, rowFromBottom: number, color: number) => void,
-    ) => {
+    const drawLeaf = (leaf: Leaf) => {
       const sprite = SPRITES[leaf.sprite]!;
       const sh = sprite.length;
       const sw = sprite[0].length;
       const halfW = (sw - 1) / 2;
-      const halfH = Math.round((sh - 1) / 2);
-      // Tumble: squash horizontally by cos(spin); flip to back side when < 0.
-      const c = Math.cos(leaf.spin);
-      const facingBack = c < 0;
-      const scale = Math.max(minScale, Math.abs(c));
-      const base = leaf.palette * 3;
-
-      for (let sy = 0; sy < sh; sy++) {
-        const row = sprite[sy]!;
-        for (let sx = 0; sx < sw; sx++) {
-          const ch = row[sx];
-          if (ch === '.') continue;
-          const srcX = facingBack ? sw - 1 - sx : sx;
-          const shade = ch === '2' ? 1 : facingBack ? 2 : 0;
-          fn(
-            Math.round((srcX - halfW) * scale),
-            sy - halfH,
-            sh - 1 - sy,
-            base + shade,
-          );
-        }
-      }
-    };
-
-    const drawLeaf = (leaf: Leaf) => {
+      const halfH = (sh - 1) / 2;
+      const { theta, a, b } = pose(leaf);
+      const sa = Math.sign(a) * Math.max(0.16, Math.abs(a));
+      const sb = Math.sign(b || 1) * Math.max(0.3, Math.abs(b));
+      const back = sa * sb < 0;
+      const cos = Math.cos(theta);
+      const sin = Math.sin(theta);
       const cx = Math.round(leaf.x);
       const cy = Math.round(leaf.y);
-      forEachPixel(leaf, 0.18, (dx, dy, _r, color) => {
-        ctx.fillStyle = COLORS[color]!;
-        ctx.fillRect(cx + dx, cy + dy, 1, 1);
-      });
-    };
+      const r = Math.ceil(Math.max(sw, sh) / 2) + 1;
+      const shadeBase = leaf.palette * 3;
+      let bottom = -r;
 
-    /** Height of the leaf's lowest pixel above the screen bottom, in art px. */
-    const leafBottom = (leaf: Leaf) => {
-      const sprite = SPRITES[leaf.sprite]!;
-      const sh = sprite.length;
-      return h - 1 - (Math.round(leaf.y) + sh - 1 - Math.round((sh - 1) / 2));
+      for (let dy = -r; dy <= r; dy++) {
+        for (let dx = -r; dx <= r; dx++) {
+          const p = cos * dx + sin * dy;
+          const q = -sin * dx + cos * dy;
+          const sx = Math.round(p / sa + halfW);
+          const sy = Math.round(q / sb + halfH);
+          if (sx < 0 || sy < 0 || sx >= sw || sy >= sh) continue;
+          const ch = sprite[sy]![sx];
+          if (ch === '.') continue;
+          const shade = ch === '2' ? 1 : back ? 2 : 0;
+          ctx.fillStyle = COLORS[shadeBase + shade]!;
+          ctx.fillRect(cx + dx, cy + dy, 1, 1);
+          if (dy > bottom) bottom = dy;
+        }
+      }
+      leaf.bottom = bottom;
     };
 
     /**
@@ -276,9 +305,49 @@ export default function FallingLeaves({
       return Math.floor(pileCap * (0.72 + 0.14 * (wave + 1)));
     };
 
+    /** Move the top cell of column `from` onto column `to`. */
+    const slide = (from: number, to: number) => {
+      const fromRow = heights[from]! - 1;
+      const toRow = heights[to]!;
+      pile[toRow * w + to] = pile[fromRow * w + from]!;
+      pile[fromRow * w + from] = 0;
+      heights[from] = fromRow;
+      heights[to] = toRow + 1;
+      paintPileCell(from, fromRow);
+      paintPileCell(to, toRow);
+    };
+
     /**
-     * Stamp a landed leaf into the pile, lying flat (full width, squashed
-     * vertically) on top of whatever is already under it.
+     * Let steep spots slump into neighbours like loose leaves would, so the
+     * surface stays continuous instead of leaving deep narrow gaps. Cells can
+     * slip up to SLUMP_REACH columns, giving a shallow angle of repose (every
+     * move lowers a cell, so this always terminates).
+     */
+    const SLUMP_REACH = 3;
+    const relax = (x0: number, x1: number) => {
+      const lo = Math.max(0, x0);
+      const hi = Math.min(w - 1, x1);
+      for (let pass = 0; pass < 24; pass++) {
+        let changed = false;
+        for (let x = lo; x <= hi; x++) {
+          for (let d = 1; d <= SLUMP_REACH; d++) {
+            for (const n of [x - d, x + d]) {
+              if (n < 0 || n >= w) continue;
+              while (heights[x]! - heights[n]! > 1 && heights[n]! < capAt(n)) {
+                slide(x, n);
+                changed = true;
+              }
+            }
+          }
+        }
+        if (!changed) break;
+      }
+    };
+
+    /**
+     * Drape a landed leaf over the pile: it lies flat (full width, squashed
+     * vertically) and each of its columns rests directly on the surface below,
+     * so there are never gaps underneath.
      */
     const settle = (leaf: Leaf) => {
       const cx = Math.round(leaf.x);
@@ -286,37 +355,42 @@ export default function FallingLeaves({
       const sh = sprite.length;
       const sw = sprite[0].length;
       const halfW = (sw - 1) / 2;
-      const flat = 0.35 + Math.random() * 0.3;
+      const flat = rand(0.35, 0.6);
       const flip = Math.random() < 0.5;
       const showBack = Math.random() < 0.35;
-      const paletteBase = leaf.palette * 3;
-      const flatH = Math.max(1, Math.round((sh - 1) * flat) + 1);
+      const shadeBase = leaf.palette * 3;
 
-      const pixels: [number, number, number][] = [];
-      let base = 0;
+      // Per column: squashed rows → colour (later rows overwrite merged ones).
+      const columns = new Map<number, Map<number, number>>();
       for (let sy = 0; sy < sh; sy++) {
         const row = sprite[sy]!;
         const r = Math.round((sh - 1 - sy) * flat);
         for (let sx = 0; sx < sw; sx++) {
           const ch = row[sx];
           if (ch === '.') continue;
-          const x = cx + Math.round(((flip ? sw - 1 - sx : sx) - halfW));
+          const x = cx + Math.round((flip ? sw - 1 - sx : sx) - halfW);
           if (x < 0 || x >= w) continue;
           const shade = ch === '2' ? 1 : showBack ? 2 : 0;
-          pixels.push([x, r, paletteBase + shade]);
-          base = Math.max(base, heights[x]! - r);
+          let col = columns.get(x);
+          if (!col) columns.set(x, (col = new Map<number, number>()));
+          col.set(r, shadeBase + shade + 1);
         }
       }
-      // Nestle slightly into the pile; once full, keep refreshing the top so
-      // newly fallen leaves stay visible.
-      base = Math.max(0, Math.min(base - 1, capAt(cx) - flatH));
-      for (const [x, r, color] of pixels) {
-        const row = base + r;
-        if (row < 0 || row >= pileCap) continue;
-        pile[row * w + x] = color + 1;
-        if (row + 1 > heights[x]!) heights[x] = row + 1;
-        paintPileCell(x, row);
+
+      for (const [x, col] of columns) {
+        const cells = [...col.entries()].sort((p, q) => p[0] - q[0]).map((e) => e[1]);
+        // Stack on the surface; once full, refresh the top layer instead.
+        const start = Math.max(0, Math.min(heights[x]!, capAt(x) - cells.length));
+        cells.forEach((c, i) => {
+          const row = start + i;
+          if (row >= pileCap) return;
+          pile[row * w + x] = c;
+          paintPileCell(x, row);
+        });
+        heights[x] = Math.max(heights[x]!, Math.min(pileCap, start + cells.length));
       }
+
+      relax(cx - sw - 8, cx + sw + 8);
     };
 
     let lastTime = 0;
@@ -326,15 +400,18 @@ export default function FallingLeaves({
       lastTime = time;
       const k = dt / 16; // normalise to ~60fps units
 
+      // Slow, layered gusts shared by every leaf.
+      const wind =
+        0.1 * Math.sin(time * 0.00011) + 0.06 * Math.sin(time * 0.00037 + 1.3);
+
       // Let the breeze decay.
       pointerVX *= 0.9;
 
       for (let i = 0; i < leaves.length; i++) {
         const leaf = leaves[i]!;
-        const sway = Math.sin(time * leaf.swayFreq + leaf.swayPhase);
 
         // Pointer breeze: nudge leaves near the cursor along its motion and
-        // slightly away from it.
+        // slightly away from it, and set them fluttering.
         if (interactive && pointerX >= 0) {
           const dx = leaf.x - pointerX;
           const dy = leaf.y - pointerY;
@@ -343,24 +420,35 @@ export default function FallingLeaves({
             const f = 1 - d2 / 400;
             const d = Math.sqrt(d2) || 1;
             leaf.vx += (pointerVX * 0.04 + (dx / d) * 0.05) * f;
-            leaf.spinSpeed = Math.min(0.006, leaf.spinSpeed + 0.0002 * f);
+            leaf.flipVel += 0.0006 * f * Math.sign(pointerVX || 1);
           }
         }
         leaf.vx *= 0.96;
 
-        leaf.x += (sway * leaf.swayAmp + leaf.vx) * k;
-        leaf.y += leaf.vy * k * (0.85 + 0.15 * Math.abs(sway));
-        leaf.spin += leaf.spinSpeed * dt;
-        // Relax spin speed back toward calm.
-        leaf.spinSpeed += (0.0012 - leaf.spinSpeed) * 0.002 * k;
+        leaf.phase += leaf.swingFreq * dt;
+        const swing = Math.cos(leaf.phase);
+        leaf.baseX += (wind + leaf.vx) * k;
+        leaf.x = leaf.baseX + leaf.swingAmp * Math.sin(leaf.phase);
 
-        if (leaf.x < -15 || leaf.x > w + 15) {
+        if (leaf.tumbler) {
+          leaf.y += leaf.fall * k;
+          leaf.orient += leaf.spinVel * dt;
+          leaf.flip += leaf.flipVel * dt;
+        } else {
+          // Fastest through the bottom of the swing, a brief lift at the ends.
+          leaf.y += leaf.fall * k * (1.35 * swing * swing - 0.12);
+          leaf.flip += leaf.flipVel * dt;
+          leaf.flipVel *= 0.985; // breeze-induced flutter settles back down
+        }
+
+        if (leaf.baseX < -20 || leaf.baseX > w + 20) {
           leaves[i] = spawn(false);
           continue;
         }
 
         const col = Math.min(w - 1, Math.max(0, Math.round(leaf.x)));
-        if (leafBottom(leaf) <= heights[col]!) {
+        const above = h - 1 - (Math.round(leaf.y) + leaf.bottom);
+        if (above <= heights[col]!) {
           settle(leaf);
           leaves[i] = spawn(false);
         }
