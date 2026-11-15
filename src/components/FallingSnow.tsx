@@ -11,11 +11,10 @@ const SPRITES = [
   ['11', '11'],
   ['.1.', '121', '.1.'],
   ['1.1.1', '.111.', '11211', '.111.', '1.1.1'],
-  ['...1...', '.1.1.1.', '..111..', '1112111', '..111..', '.1.1.1.', '...1...'],
 ] as const;
 
 /** How often each sprite size spawns (same order as SPRITES). */
-const SPRITE_WEIGHTS = [0.42, 0.24, 0.2, 0.1, 0.04];
+const SPRITE_WEIGHTS = [0.45, 0.27, 0.21, 0.07];
 
 /** Flake tones from far (dim, cool) to near (bright): [body, core]. */
 const FLAKE_TONES = [
