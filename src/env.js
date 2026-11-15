@@ -19,6 +19,7 @@ export const env = createEnv({
     AUTH_GITHUB_SECRET: z.string(),
     ADMIN_GITHUB_USERNAMES: z.string(),
     CONTACT_FORM_SECRET: z.string(),
+    SITE_BACKGROUND: z.enum(["leaves", "rain"]).default("leaves"),
   },
   client: {
     // NEXT_PUBLIC_CLIENTVAR: z.string(),
@@ -40,6 +41,7 @@ export const env = createEnv({
     AUTH_GITHUB_SECRET: process.env.AUTH_GITHUB_SECRET,
     ADMIN_GITHUB_USERNAMES: process.env.ADMIN_GITHUB_USERNAMES,
     CONTACT_FORM_SECRET: process.env.CONTACT_FORM_SECRET,
+    SITE_BACKGROUND: process.env.SITE_BACKGROUND,
   },
   skipValidation: !!process.env.SKIP_ENV_VALIDATION,
 });
