@@ -19,7 +19,7 @@ export const env = createEnv({
     AUTH_GITHUB_SECRET: z.string(),
     ADMIN_GITHUB_USERNAMES: z.string(),
     CONTACT_FORM_SECRET: z.string(),
-    SITE_BACKGROUND: z.enum(["leaves", "rain", "snow", "dynamic"]).default("leaves"),
+    SITE_BACKGROUND: z.enum(["leaves", "rain", "snow", "night", "dynamic"]).default("leaves"),
   },
   client: {
     // NEXT_PUBLIC_CLIENTVAR: z.string(),

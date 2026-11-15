@@ -15,6 +15,7 @@ export const SEASONAL_BACKGROUNDS: readonly {
 }[] = [
   { from: [9, 1], to: [11, 30], background: "leaves" }, // fall
   { from: [12, 1], to: [2, 29], background: "snow" }, // winter (Feb 29 covers leap years)
+  { from: [6, 1], to: [8, 31], background: "night" }, // summer (firefly season)
 ];
 
 /** Used on any date no row matches. */
