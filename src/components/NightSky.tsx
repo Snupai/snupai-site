@@ -37,12 +37,15 @@ const AURORA_LOW: RGB = [96, 255, 168];
 const AURORA_MID: RGB = [64, 214, 210];
 const AURORA_HIGH: RGB = [156, 112, 245];
 /** Peak aurora alpha, and the number of stepped alpha levels below it. */
-const AURORA_ALPHA = 0.32;
-const AURORA_LEVELS = 5;
+const AURORA_ALPHA = 0.2;
+const AURORA_LEVELS = 10;
 
 const BANK: RGB = [11, 14, 22];
 const BANK_RIM: RGB = [28, 33, 52];
 const REED: RGB = [16, 21, 28];
+/** The near bank is a darker foreground silhouette than the far one. */
+const NEAR_BANK: RGB = [10, 13, 22];
+const NEAR_RIM: RGB = [26, 32, 52];
 const CATTAIL: RGB = [34, 26, 24];
 
 const WATER: RGB = [12, 17, 36];
@@ -166,6 +169,20 @@ export default function NightSky({ className, shootingStars = true }: NightSkyPr
     let w = 0;
     let h = 0;
     let horizon = 0;
+    // Per column: the waterline (far shore) and the first row of the near
+    // bank (h where there is none and the water runs on behind the footer).
+    let wl = new Int16Array(0);
+    let near = new Int16Array(0);
+    let riverH = 0;
+    // Per-row river phases, refilled each frame.
+    let rowShift = new Int16Array(0);
+    let rowWob = new Float32Array(0);
+    let rowS1 = new Float32Array(0);
+    let rowS2 = new Float32Array(0);
+    let rowS3 = new Float32Array(0);
+    let rowMix = new Float32Array(0);
+    // A fresh river course per page load, kept across resizes.
+    const seed = Math.floor(Math.random() * 10000);
     let image: ImageData | null = null;
     let buf = new Uint8ClampedArray(0);
     let staticBuf = new Uint8ClampedArray(0);
@@ -313,19 +330,24 @@ export default function NightSky({ className, shootingStars = true }: NightSkyPr
 
       // Far bank: a low rolling silhouette with grass blades and the odd reed.
       for (let x = 0; x < w; x++) {
-        const rise = Math.round(1 + 2.2 * noise(x / 26, 71) + 1.4 * noise(x / 9, 72));
-        const top = horizon - rise;
-        for (let y = top; y < horizon; y++) {
+        const rise = Math.round(
+          1 +
+            riverH * 0.22 * noise(x / 120, seed + 70) +
+            2.2 * noise(x / 26, seed + 71) +
+            1.4 * noise(x / 9, seed + 72),
+        );
+        const top = wl[x]! - rise;
+        for (let y = top; y < wl[x]!; y++) {
           const i = (y * w + x) * 4;
           const c = y === top ? BANK_RIM : BANK;
           b[i] = c[0];
           b[i + 1] = c[1];
           b[i + 2] = c[2];
         }
-        const r = hash(x, 73);
+        const r = hash(x, seed + 73);
         let blade = 0;
-        if (r < 0.04) blade = 6 + Math.floor(hash(x, 74) * 6);
-        else if (r < 0.45) blade = 1 + Math.floor(hash(x, 75) * 3);
+        if (r < 0.04) blade = 6 + Math.floor(hash(x, seed + 74) * 6);
+        else if (r < 0.45) blade = 1 + Math.floor(hash(x, seed + 75) * 3);
         for (let j = 1; j <= blade; j++) {
           const y = top - j;
           if (y < 0) break;
@@ -356,9 +378,32 @@ export default function NightSky({ className, shootingStars = true }: NightSkyPr
 
       // Visible water above the footer, plus the rows hidden behind it.
       const footer = Math.ceil(FOOTER_PX / PX);
-      const riverH = Math.max(10, Math.min(30, Math.round((h - footer) * 0.1)));
+      riverH = Math.max(12, Math.min(36, Math.round((h - footer) * 0.12)));
       horizon = Math.max(1, h - footer - riverH);
       const shore = h - footer;
+
+      // The far shore winds back and forth, and grassy points of the near
+      // bank jut into the water here and there, so the river meanders
+      // instead of running as one straight band.
+      wl = new Int16Array(w);
+      near = new Int16Array(w);
+      const bend = riverH * 0.45;
+      for (let x = 0; x < w; x++) {
+        const n = 0.7 * noise(x / 150, seed + 61) + 0.3 * noise(x / 55, seed + 62);
+        wl[x] = horizon + Math.round(n * bend);
+        const p = smooth(0.6, 0.88, 0.75 * noise(x / 110, seed + 81) + 0.25 * noise(x / 35, seed + 82));
+        // The slope starts down behind the footer, so a point rises gently out
+        // of it instead of starting with a wall at the footer's edge.
+        const lift = Math.round(p * (riverH * 0.5 + footer) + 1.5 * noise(x / 6, seed + 83)) - footer;
+        near[x] = p > 0 && shore - lift < h ? Math.max(wl[x]! + 4, shore - lift) : h;
+      }
+      const rows = h - horizon;
+      rowShift = new Int16Array(rows);
+      rowWob = new Float32Array(rows);
+      rowS1 = new Float32Array(rows);
+      rowS2 = new Float32Array(rows);
+      rowS3 = new Float32Array(rows);
+      rowMix = new Float32Array(rows);
 
       moonR = Math.max(5, Math.min(11, Math.round(Math.min(w, h) * 0.032)));
       moonX = Math.round(w > 320 ? w * 0.8 : w * 0.72);
@@ -396,9 +441,11 @@ export default function NightSky({ className, shootingStars = true }: NightSkyPr
       const flies = Math.max(5, Math.min(14, Math.round(w / 55)));
       fireflies = [];
       for (let n = 0; n < flies; n++) {
+        const x = rand(0, w);
+        const c = Math.min(w - 1, Math.floor(x));
         fireflies.push({
-          x: rand(0, w),
-          ground: Math.round(rand(horizon - 4, shore - 2)),
+          x,
+          ground: Math.round(rand(wl[c]! - 4, Math.min(near[c]!, shore) - 2)),
           lift: rand(3, 14),
           vx: 0,
           vl: 0,
@@ -408,24 +455,22 @@ export default function NightSky({ className, shootingStars = true }: NightSkyPr
         });
       }
 
-      // Reed clumps at the near corners, standing in the water.
+      // Reeds grow along the near banks, densest at the water's edge.
       reeds = [];
-      const clump = (from: number, to: number) => {
-        for (let x = from; x < to; x += 1 + Math.floor(Math.random() * 2)) {
-          const tall = Math.random();
-          reeds.push({
-            x,
-            base: h - 1,
-            height: Math.round(footer + riverH * (0.45 + 0.6 * tall) + rand(0, 4)),
-            lean: rand(-0.12, 0.12),
-            head: tall > 0.55,
-            phase: rand(0, Math.PI * 2),
-          });
-        }
-      };
-      const span = Math.max(6, Math.round(w * 0.025));
-      clump(1, 1 + span);
-      clump(w - 2 - span, w - 1);
+      for (let x = 1; x < w - 1; x++) {
+        if (near[x]! >= h) continue;
+        const atEdge = near[x - 1]! >= h || near[x + 1]! >= h;
+        if (hash(x, seed + 90) > (atEdge ? 0.7 : 0.1)) continue;
+        const tall = Math.random();
+        reeds.push({
+          x,
+          base: near[x]! + 1,
+          height: Math.round(riverH * (0.25 + 0.4 * tall) + rand(0, 3)),
+          lean: rand(-0.12, 0.12),
+          head: tall > 0.55,
+          phase: rand(0, Math.PI * 2),
+        });
+      }
     };
 
     // --- simulation -----------------------------------------------------
@@ -521,8 +566,8 @@ export default function NightSky({ className, shootingStars = true }: NightSkyPr
     ];
 
     /** Stepped aurora colours, green at the lower edge through teal to violet. */
-    const AURORA_STEPS: RGB[] = Array.from({ length: 7 }, (_, k) => {
-      const cf = k / 6;
+    const AURORA_STEPS: RGB[] = Array.from({ length: 13 }, (_, k) => {
+      const cf = k / 12;
       const [a, b, p] =
         cf < 0.5 ? [AURORA_LOW, AURORA_MID, cf / 0.5] : [AURORA_MID, AURORA_HIGH, (cf - 0.5) / 0.5];
       return [a[0] + (b[0] - a[0]) * p, a[1] + (b[1] - a[1]) * p, a[2] + (b[2] - a[2]) * p];
@@ -540,13 +585,13 @@ export default function NightSky({ className, shootingStars = true }: NightSkyPr
         const ph = r.seed * 2.3;
         for (let x = 0; x < w; x++) {
           // Curtains slowly appear, drift and dissolve along the ribbon.
-          const presence = smooth(0.3, 0.7, noise(x / 85 + t * 0.000018 * r.drift, r.seed * 13));
+          const presence = smooth(0.25, 0.75, noise(x / 85 + t * 0.000018 * r.drift, r.seed * 13));
           if (presence <= 0) continue;
           const ripple = 0.85 + 0.15 * Math.sin(x * 0.09 - t * 0.0008 * r.drift + ph);
           const I = presence * ripple;
           // Rays: three solid brightness steps, drifting sideways.
           const rn = noise(x / 3.5 + t * 0.00011 * r.drift, r.seed * 13 + 5);
-          const rays = rn > 0.62 ? 1 : rn > 0.38 ? 0.72 : 0.5;
+          const rays = rn > 0.62 ? 1 : rn > 0.38 ? 0.84 : 0.68;
           const edge = Math.round(
             horizon *
               (r.base +
@@ -562,10 +607,14 @@ export default function NightSky({ className, shootingStars = true }: NightSkyPr
             const y = edge - dy;
             if (y < 0) break;
             const f = dy / height;
-            const profile = dy < 2 ? 1 : 0.8 * (1 - f) ** 1.4;
+            // The lower edge fades in over a few rows, then a long, even fade upward.
+            const profile = dy < 3 ? 0.4 + 0.2 * dy : (1 - f) ** 1.2;
             const level = Math.floor(I * profile * AURORA_LEVELS) / AURORA_LEVELS;
-            if (level <= 0) break;
-            const c = AURORA_STEPS[Math.min(6, Math.floor(f * 6) + r.tint)]!;
+            if (level <= 0) {
+              if (dy < 3) continue;
+              break;
+            }
+            const c = AURORA_STEPS[Math.min(12, Math.floor(f * 12) + r.tint * 2)]!;
             const a = level * amp;
             const i = (y * w + x) * 4;
             buf[i] = buf[i]! + c[0] * a;
@@ -598,26 +647,36 @@ export default function NightSky({ className, shootingStars = true }: NightSkyPr
     };
 
     const drawRiver = (t: number) => {
-      const riverH = h - horizon;
-      const moonCol = Math.round(moonX);
-      for (let d = 0; d < riverH; d++) {
-        const y = horizon + d;
-        const depth = d / riverH;
-        // Mirror the rows just above the waterline, stretched a little.
-        const srcY = Math.max(0, horizon - 1 - Math.floor(d * 1.6));
-        const rowShift = Math.sin(d * 0.8 + t * 0.0016) * (0.4 + depth * 1.6);
-        const mix = 0.5 - depth * 0.15;
-        // Per-row phases; the per-pixel work then only uses the sine table.
-        const wob = d + t * 0.002;
-        const s1 = d * 2.1 + t * 0.0017;
-        const s2 = d * 1.3 - t * 0.0011;
-        const s3 = d + t * 0.0039;
-        const shift = Math.round(rowShift);
-        const row = srcY * w;
+      const rows = h - horizon;
+      // Per-row phases; the per-pixel work then only uses the sine table.
+      for (let d = 0; d < rows; d++) {
+        const depth = Math.min(1, d / riverH);
+        rowShift[d] = Math.round(Math.sin(d * 0.8 + t * 0.0016) * (0.4 + depth * 1.6));
+        rowWob[d] = d + t * 0.002;
+        rowS1[d] = d * 2.1 + t * 0.0017;
+        rowS2[d] = d * 1.3 - t * 0.0011;
+        rowS3[d] = d + t * 0.0039;
+        rowMix[d] = 0.5 - depth * 0.15;
+      }
+
+      // Row by row (rows follow the winding waterline), so writes stay mostly
+      // sequential in memory.
+      for (let d = 0; d < rows; d++) {
+        const shift = rowShift[d]!;
+        const wob = rowWob[d]!;
+        const s1 = rowS1[d]!;
+        const s2 = rowS2[d]!;
+        const s3 = rowS3[d]!;
+        const mix = rowMix[d]!;
+        const back = 1 + Math.floor(d * 1.6);
         for (let x = 0; x < w; x++) {
+          const y = wl[x]! + d;
+          if (y >= near[x]!) continue;
           let sx = x + shift + Math.round(0.6 * sinL(x * 0.15 + wob));
           sx = sx < 0 ? 0 : sx >= w ? w - 1 : sx;
-          const si = (row + sx) * 4;
+          // Mirror the rows just above the waterline, stretched a little.
+          const srcY = Math.max(0, wl[sx]! - back);
+          const si = (srcY * w + sx) * 4;
           const i = (y * w + x) * 4;
           buf[i] = WATER[0] + (buf[si]! * 0.75 - WATER[0]) * mix;
           buf[i + 1] = WATER[1] + (buf[si + 1]! * 0.75 - WATER[1]) * mix;
@@ -625,25 +684,48 @@ export default function NightSky({ className, shootingStars = true }: NightSkyPr
 
           // A faint wash of aurora colour where curtains hang above.
           const au = auroraCol[x]!;
-          if (au > 0.25) blendAt(buf, i, AURORA_LOW, Math.floor(au * 3) * 0.03);
+          if (au > 0.25) blendAt(buf, i, AURORA_LOW, Math.floor(au * 3) * 0.02);
 
           // Horizontal shimmer streaks drifting across the surface.
           const sh = sinL(x * 0.19 + s1) + sinL(x * 0.067 + s2) * 0.8 + sinL(x * 0.47 + s3) * 0.3;
           if (sh > 1.75) blendAt(buf, i, GLINT, 0.32);
           else if (sh > 1.35) blendAt(buf, i, SHIMMER, 0.22);
         }
+      }
 
-        // The moon's broken, wavy reflection column.
-        if (illum < 0.04) continue;
+      // The moon's broken, wavy reflection column, following the shoreline.
+      if (illum < 0.04) return;
+      const moonCol = Math.round(moonX);
+      const strength = 0.75 * (0.35 + 0.65 * illum);
+      for (let d = 0; d < rows; d++) {
         const n = noise(d * 0.9 + t * 0.0011, 31) * (0.6 + 0.4 * Math.sin(t * 0.0023 + d * 1.9));
         if (n < 0.28) continue;
+        const depth = Math.min(1, d / riverH);
         const half = Math.round(moonR * (0.25 + 0.55 * depth) * n * (0.5 + 0.5 * illum));
         const cx = moonCol + Math.round(Math.sin(d * 1.7 + t * 0.0019) * 1.2 + Math.sin(t * 0.0011 + d * 0.5));
-        const strength = 0.75 * (0.35 + 0.65 * illum);
-        for (let x = cx - half; x <= cx + half; x++) {
+        for (let x = Math.max(0, cx - half); x <= Math.min(w - 1, cx + half); x++) {
+          const y = wl[x]! + d;
+          if (y >= near[x]!) continue;
           const edge = Math.abs(x - cx) === half && half > 0;
           plot(x, y, MOON_GLITTER, edge ? strength * 0.45 : strength);
         }
+      }
+    };
+
+    /** Foreground banks: a dark silhouette with a lighter rim and short grass. */
+    const drawNearBank = () => {
+      for (let x = 0; x < w; x++) {
+        const top = near[x]!;
+        if (top >= h) continue;
+        for (let y = top; y < h; y++) {
+          const i = (y * w + x) * 4;
+          const c = y === top ? NEAR_RIM : NEAR_BANK;
+          buf[i] = c[0];
+          buf[i + 1] = c[1];
+          buf[i + 2] = c[2];
+        }
+        const blade = hash(x, seed + 95) < 0.55 ? 1 + Math.floor(hash(x, seed + 96) * 3) : 0;
+        for (let j = 1; j <= blade; j++) plot(x, top - j, NEAR_BANK, 1);
       }
     };
 
@@ -687,9 +769,10 @@ export default function NightSky({ className, shootingStars = true }: NightSkyPr
           plot(x + 1, y + 1, FIREFLY_GLOW, g);
         }
         // A faint, wobbling reflection when hovering over water.
-        if (f.ground >= horizon) {
+        const fc = Math.min(w - 1, Math.max(0, x));
+        if (f.ground > wl[fc]! && f.ground < near[fc]!) {
           const ry = Math.round(f.ground + f.lift * 0.6);
-          if (ry < h) {
+          if (ry < near[fc]!) {
             const rx = x + Math.round(Math.sin(t * 0.003 + f.wander) * 0.8);
             plot(rx, ry, FIREFLY, a * 0.35);
           }
@@ -705,6 +788,7 @@ export default function NightSky({ className, shootingStars = true }: NightSkyPr
       drawAurora(t);
       drawShooting();
       drawRiver(t);
+      drawNearBank();
       drawReeds(t);
       drawFireflies(t);
       ctx.putImageData(image, 0, 0);
