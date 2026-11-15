@@ -1,7 +1,6 @@
 import { env } from "~/env";
-import FallingRain from "~/components/FallingRain";
-import FallingLeaves from "~/components/FallingLeaves";
-import FallingSnow from "~/components/FallingSnow";
+import { BACKGROUNDS } from "~/components/backgrounds";
+import DynamicBackground from "~/components/DynamicBackground";
 
 /**
  * Site-wide ambient layer.
@@ -16,6 +15,8 @@ import FallingSnow from "~/components/FallingSnow";
  *   - "rain": pixel-art rain with wind gusts, splashes and a puddle line
  *     that fills up on top of the footer
  *   - "snow": pixel-art snowfall that drifts into a pile on top of the footer
+ *   - "dynamic": picks one of the above from the visitor's local date, using
+ *     the table in `~/lib/seasonalBackground`
  */
 export default function SiteBackground() {
   return (
@@ -23,17 +24,11 @@ export default function SiteBackground() {
       aria-hidden="true"
       className="pointer-events-none fixed inset-0 -z-10 flex items-center justify-center"
     >
-      {env.SITE_BACKGROUND === "rain" ? (
-        // Like the leaves, stop at the fixed h-12 footer so splashes and the
-        // puddle land on top of it.
-        <FallingRain className="absolute inset-x-0 top-0 bottom-12 h-[calc(100%-3rem)] w-full opacity-[0.7] [filter:drop-shadow(0_0_3px_rgba(137,220,235,0.3))] [mask-image:linear-gradient(to_bottom,transparent,black_18%)]" />
-      ) : env.SITE_BACKGROUND === "snow" ? (
-        // Like the leaves, stop at the fixed h-12 footer so the drift rests on it.
-        <FallingSnow className="absolute inset-x-0 top-0 bottom-12 h-[calc(100%-3rem)] w-full opacity-[0.6] [filter:drop-shadow(0_0_3px_rgba(205,225,255,0.35))] [mask-image:linear-gradient(to_bottom,transparent,black_18%)]" />
+      {env.SITE_BACKGROUND === "dynamic" ? (
+        <DynamicBackground />
       ) : (
-        // Stop at the fixed h-12 footer so the leaf pile rests on top of it
-        // instead of being hidden behind it.
-        <FallingLeaves className="absolute inset-x-0 top-0 bottom-12 h-[calc(100%-3rem)] w-full opacity-[0.55] [filter:drop-shadow(0_0_4px_rgba(210,105,30,0.3))] [mask-image:linear-gradient(to_bottom,transparent,black_18%)]" />
+        // Fall back to leaves when validation is skipped and the var is unset.
+        (BACKGROUNDS[env.SITE_BACKGROUND] ?? BACKGROUNDS.leaves)()
       )}
     </div>
   );
